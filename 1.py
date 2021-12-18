@@ -71,7 +71,7 @@ def start_menu():
         tick = clock.tick()
         pygame.display.flip()
     pygame.quit()
-
+# 1
 
 def game_cycle():
     """ Отрисовка самого меню """
@@ -85,12 +85,11 @@ def game_cycle():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-               #     logging.warning('game exit by keys')
+                    # logging.warning('game exit by keys')
                     show = False
 
         screen.blit(menu_background, (0, 0))
         pygame.display.update()
-
 
 
 if __name__ == '__main__':
