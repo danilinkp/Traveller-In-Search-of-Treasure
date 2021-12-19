@@ -54,7 +54,7 @@ class Button:
             font = pygame.font.Font(None, font_size)
             text = font.render(message, True, 'white')
             screen.blit(text, (
-            x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
+                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
             if clicked[0]:
                 pygame.mixer.Sound.play(MENU_BTN_SOUND)
                 pygame.time.delay(300)
@@ -65,19 +65,22 @@ class Button:
             font = pygame.font.Font(None, font_size)
             text = font.render(message, True, 'white')
             screen.blit(text, (
-            x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
+                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
 
 def show_menu(screen):
     """ Отрисовка самого меню """
     menu_background = pygame.image.load('images/background.jpg')
-    show = True
+    show_menu_f = True
     start_btn = Button(300, 70)
-    while show:
+    while show_menu_f:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    show_menu_f = False
 
         screen.blit(menu_background, (0, 0))
         start_btn.draw(430, 200, 'Start game', 'btn.png', game_cycle)
@@ -100,14 +103,17 @@ def start_menu():
 def game_cycle():
     """ Отрисовка самого меню """
     menu_background = pygame.image.load('images/background_2.jpg')
-    show = True
+    game_cycle_show = True
     story_mode_btn = Button(460, 100)
     pvp_btn = Button(460, 100)
-    while show:
+    while game_cycle_show:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_cycle_show = False
 
         screen.blit(menu_background, (0, 0))
         story_mode_btn.draw(80, 80, 'Story mode', 'btn.png', story_mode)
@@ -117,29 +123,216 @@ def game_cycle():
 
 def story_mode():
     """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/background_3.jpg')
-    show = True
-    while show:
+    menu_background = pygame.image.load('images/background_5.jpg')
+    story_mode_show = True
+    new_game = Button(540, 150)
+    store = Button(460, 100)
+    heroes = Button(460, 100)
+    while story_mode_show:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    story_mode_show = False
 
         screen.blit(menu_background, (0, 0))
+        new_game.draw(360, 80, 'NEW GAME', 'btn.png', story_mode_new_game)
+        store.draw(400, 260, 'STORE', 'btn.png', store_mode)
+        heroes.draw(400, 400, 'HEROES', 'btn.png')
+
+        pygame.display.update()
+
+
+def story_mode_new_game():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/for_nickname.jpg')
+    story_mode_new_game_show = True
+    new_game = Button(380, 70)
+    while story_mode_new_game_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    story_mode_new_game_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(880, 600, 'ok', 'btn.png', story_mode_new_game_select_heroes)
+        pygame.display.update()
+
+
+def story_mode_new_game_select_heroes():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/select_heroes.jpg')
+    story_mode_new_game_select_heroes_show = True
+    new_game = Button(380, 70)
+    while story_mode_new_game_select_heroes_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    story_mode_new_game_select_heroes_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(450, 620, 'select', 'btn.png', levels_show_menu)
+        pygame.display.update()
+
+
+def levels_show_menu():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/start_level.jpg')
+    levels_show = True
+    new_game = Button(500, 100)
+    while levels_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    levels_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(700, 560, 'start', 'btn.png', game)
         pygame.display.update()
 
 
 def pvp_mode():
     """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/background_4.jpg')
-    show = True
-    while show:
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    pvp_mode_show = True
+    new_game = Button(250, 70)
+    while pvp_mode_show:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pvp_mode_show = False
 
         screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'select', 'btn.png', pvp_mode_2)
+        new_game.draw(515, 500, 'select', 'btn.png', pvp_mode_2)
+        new_game.draw(885, 500, 'select', 'btn.png', pvp_mode_2)
+        pygame.display.update()
+
+
+def pvp_mode_2():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    pvp_mode_2_show = True
+    new_game = Button(250, 70)
+    while pvp_mode_2_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pvp_mode_2_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'start', 'btn.png', play_pvp_mode)
+        new_game.draw(515, 500, 'start', 'btn.png', play_pvp_mode)
+        new_game.draw(885, 500, 'start', 'btn.png', play_pvp_mode)
+        pygame.display.update()
+
+
+def game():
+    pass
+
+
+def play_pvp_mode():
+    pass
+
+
+def store_mode():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    story_mode_new_game_show = True
+    new_game = Button(250, 70)
+    while story_mode_new_game_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    story_mode_new_game_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'select', 'btn.png', buy_mage)
+        new_game.draw(515, 500, 'select', 'btn.png', buy_warrior)
+        new_game.draw(885, 500, 'select', 'btn.png', buy_archer)
+        pygame.display.update()
+
+
+def buy_mage():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    buy_mage_show = True
+    new_game = Button(250, 70)
+    while buy_mage_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    buy_mage_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        pygame.display.update()
+
+
+def buy_warrior():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    buy_warrior_show = True
+    new_game = Button(250, 70)
+    while buy_warrior_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    buy_warrior_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        pygame.display.update()
+
+
+def buy_archer():
+    """ Отрисовка самого меню """
+    menu_background = pygame.image.load('images/buy_skin.jpg')
+    buy_archer_show = True
+    new_game = Button(250, 70)
+    while buy_archer_show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    buy_archer_show = False
+
+        screen.blit(menu_background, (0, 0))
+        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
+        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
         pygame.display.update()
 
 
