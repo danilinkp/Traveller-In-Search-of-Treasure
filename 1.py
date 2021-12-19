@@ -166,9 +166,9 @@ def store_mode():
 
 def buy_mage():
     name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
                                 ])
     name.run()  # потом нужно будет исправить
 
