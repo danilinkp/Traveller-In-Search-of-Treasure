@@ -89,6 +89,7 @@ def show_menu(screen, clock):
     start_btn = Button(300, 70)
     settings_btn = Button(300, 70)
     scores_btn = Button(300, 70)
+    help_btn = Button(300, 70)
     exit_btn = Button(300, 70)
     while show:
         for event in pygame.event.get():
@@ -100,7 +101,8 @@ def show_menu(screen, clock):
         start_btn.draw(WIDTH - 500, HEIGHT - 500, 'btn_menu.png', 'Start game', game_cycle)
         settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'btn_menu.png', 'Settings', settings)
         scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'btn_menu.png', 'Scores', scores)
-        exit_btn.draw(WIDTH - 500, HEIGHT - 230, 'btn_menu.png', 'Exit', terminate)
+        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'btn_menu.png', 'Exit', terminate)
+        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'btn_menu.png', 'Help', help_menu)
         pygame.display.update()
         clock.tick(60)
 
@@ -188,6 +190,23 @@ def scores():
                     show = False
 
         screen.blit(menu_background, (0, 0))
+        pygame.display.update()
+
+
+def help_menu():
+    about = load_image('background_2.jpg')
+    show = True
+    while show:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    show = False
+
+        screen.blit(about, (0, 0))
         pygame.display.update()
 
 
