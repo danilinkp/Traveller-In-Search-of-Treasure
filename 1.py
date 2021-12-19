@@ -1,7 +1,5 @@
-import logging
 import os
 import sys
-from time import sleep
 
 import pygame
 
@@ -68,7 +66,7 @@ class Button:
                 x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
 
-def show_menu(screen):
+def show_menu():
     """ Отрисовка самого меню """
     menu_background = pygame.image.load('images/background.jpg')
     show_menu_f = True
@@ -78,9 +76,6 @@ def show_menu(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    show_menu_f = False
 
         screen.blit(menu_background, (0, 0))
         start_btn.draw(430, 200, 'Start game', 'btn.png', game_cycle)
@@ -89,159 +84,67 @@ def show_menu(screen):
 
 def start_menu():
     running = True
-    clock = pygame.time.Clock()
-    show_menu(screen)
+    show_menu()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        tick = clock.tick()
         pygame.display.flip()
     pygame.quit()
 
 
 def game_cycle():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/background_2.jpg')
-    game_cycle_show = True
-    story_mode_btn = Button(460, 100)
-    pvp_btn = Button(460, 100)
-    while game_cycle_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    game_cycle_show = False
-
-        screen.blit(menu_background, (0, 0))
-        story_mode_btn.draw(80, 80, 'Story mode', 'btn.png', story_mode)
-        pvp_btn.draw(730, 80, 'PVP mode', 'btn.png', pvp_mode)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/background_2.jpg', [(460, 100), (460, 100)],
+                               [[(80, 80), 'Story mode', 'btn.png', story_mode],
+                                [(730, 80), 'PVP mode', 'btn.png', pvp_mode]])
+    name.run()
 
 
 def story_mode():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/background_5.jpg')
-    story_mode_show = True
-    new_game = Button(540, 150)
-    store = Button(460, 100)
-    heroes = Button(460, 100)
-    while story_mode_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    story_mode_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(360, 80, 'NEW GAME', 'btn.png', story_mode_new_game)
-        store.draw(400, 260, 'STORE', 'btn.png', store_mode)
-        heroes.draw(400, 400, 'HEROES', 'btn.png')
-
-        pygame.display.update()
+    name = FunctionCallDrawing('images/background_5.jpg', [(540, 150), (460, 100), (460, 100)],
+                               [[(360, 80), 'NEW GAME', 'btn.png', story_mode_new_game],
+                                [(400, 260), 'STORE', 'btn.png', store_mode],
+                                [(400, 400), 'HEROES', 'btn.png', pvp_mode]
+                                ])
+    name.run()
 
 
 def story_mode_new_game():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/for_nickname.jpg')
-    story_mode_new_game_show = True
-    new_game = Button(380, 70)
-    while story_mode_new_game_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    story_mode_new_game_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(880, 600, 'ok', 'btn.png', story_mode_new_game_select_heroes)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/for_nickname.jpg', [(380, 70)],
+                               [[(880, 600), 'ok', 'btn.png', story_mode_new_game_select_heroes]])
+    name.run()
 
 
 def story_mode_new_game_select_heroes():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/select_heroes.jpg')
-    story_mode_new_game_select_heroes_show = True
-    new_game = Button(380, 70)
-    while story_mode_new_game_select_heroes_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    story_mode_new_game_select_heroes_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(450, 620, 'select', 'btn.png', levels_show_menu)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/select_heroes.jpg', [(380, 70)],
+                               [[(450, 620), 'select', 'btn.png', levels_show_menu]])
+    name.run()
 
 
 def levels_show_menu():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/start_level.jpg')
-    levels_show = True
-    new_game = Button(500, 100)
-    while levels_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    levels_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(700, 560, 'start', 'btn.png', game)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/start_level.jpg', [(500, 100)],
+                               [[(700, 560), 'start', 'btn.png', game]])
+    name.run()
 
 
 def pvp_mode():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    pvp_mode_show = True
-    new_game = Button(250, 70)
-    while pvp_mode_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pvp_mode_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'select', 'btn.png', pvp_mode_2)
-        new_game.draw(515, 500, 'select', 'btn.png', pvp_mode_2)
-        new_game.draw(885, 500, 'select', 'btn.png', pvp_mode_2)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               # потом нужно будет исправить
+                               [[(145, 500), 'select', 'btn.png', pvp_mode_2],
+                                [(515, 500), 'select', 'btn.png', pvp_mode_2],
+                                [(885, 500), 'select', 'btn.png', pvp_mode_2]
+                                ])
+    name.run()
 
 
 def pvp_mode_2():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    pvp_mode_2_show = True
-    new_game = Button(250, 70)
-    while pvp_mode_2_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pvp_mode_2_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'start', 'btn.png', play_pvp_mode)
-        new_game.draw(515, 500, 'start', 'btn.png', play_pvp_mode)
-        new_game.draw(885, 500, 'start', 'btn.png', play_pvp_mode)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               # потом нужно будет исправить
+                               [[(145, 500), 'select', 'btn.png', play_pvp_mode],
+                                [(515, 500), 'select', 'btn.png', play_pvp_mode],
+                                [(885, 500), 'select', 'btn.png', play_pvp_mode]
+                                ])
+    name.run()
 
 
 def game():
@@ -253,87 +156,74 @@ def play_pvp_mode():
 
 
 def store_mode():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    story_mode_new_game_show = True
-    new_game = Button(250, 70)
-    while story_mode_new_game_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    story_mode_new_game_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'select', 'btn.png', buy_mage)
-        new_game.draw(515, 500, 'select', 'btn.png', buy_warrior)
-        new_game.draw(885, 500, 'select', 'btn.png', buy_archer)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               [[(145, 500), 'select', 'btn.png', buy_mage],
+                                [(515, 500), 'select', 'btn.png', buy_warrior],
+                                [(885, 500), 'select', 'btn.png', buy_archer]
+                                ])
+    name.run()
 
 
 def buy_mage():
-    """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    buy_mage_show = True
-    new_game = Button(250, 70)
-    while buy_mage_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    buy_mage_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                                ])
+    name.run()  # потом нужно будет исправить
 
 
 def buy_warrior():
     """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    buy_warrior_show = True
-    new_game = Button(250, 70)
-    while buy_warrior_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    buy_warrior_show = False
-
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        pygame.display.update()
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                                ])
+    name.run()  # потом нужно будет исправить
 
 
 def buy_archer():
     """ Отрисовка самого меню """
-    menu_background = pygame.image.load('images/buy_skin.jpg')
-    buy_archer_show = True
-    new_game = Button(250, 70)
-    while buy_archer_show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    buy_archer_show = False
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                                ])
+    name.run()  # потом нужно будет исправить
 
-        screen.blit(menu_background, (0, 0))
-        new_game.draw(145, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(515, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        new_game.draw(885, 500, 'buy', 'btn.png', story_mode_new_game_select_heroes)
-        pygame.display.update()
+
+class FunctionCallDrawing:
+    def __init__(self, backgroundimage, w_h, name_coords_fun):
+        self.back_im = backgroundimage
+        self.w_h = w_h
+        self.name_coords_fun = name_coords_fun
+        self.buttons = []
+        self.running = True
+
+    def run(self):
+        menu_background = pygame.image.load(self.back_im)
+
+        for i in self.w_h:
+            self.buttons.append(Button(i[0], i[1]))
+            print(i)
+        while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+
+            screen.blit(menu_background, (0, 0))
+            for i in range(len(self.buttons)):
+                self.buttons[i].draw(self.name_coords_fun[i][0][0],
+                                     self.name_coords_fun[i][0][1],
+                                     self.name_coords_fun[i][1],
+                                     self.name_coords_fun[i][2],
+                                     self.name_coords_fun[i][3])
+            pygame.display.update()
 
 
 if __name__ == '__main__':
