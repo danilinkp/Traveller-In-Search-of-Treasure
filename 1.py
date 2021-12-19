@@ -19,6 +19,7 @@ DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('images', name)
     # если файл не существует, то выходим
@@ -79,6 +80,7 @@ class SystemButton:
                     (x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
 
+
 def show_menu(screen, clock):
     """ Отрисовка самого меню """
     menu_background = load_image('background.jpg')
@@ -95,11 +97,11 @@ def show_menu(screen, clock):
                 quit()
 
         screen.blit(menu_background, (0, 0))
-        start_btn.draw(WIDTH - 500, HEIGHT - 500, 'btn_menu.png', 'Start game', game_cycle)
-        settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'btn_menu.png', 'Settings', settings)
-        scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'btn_menu.png', 'Scores', scores)
-        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'btn_menu.png', 'Exit', terminate)
-        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'btn_menu.png', 'Help', help_menu)
+        start_btn.draw(WIDTH - 500, HEIGHT - 500, 'Start game', 'btn_menu.png', game_cycle)
+        settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'Settings', 'btn_menu.png', settings)
+        scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'Scores', 'btn_menu.png', scores)
+        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'Exit', 'btn_menu.png', terminate)
+        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'Help', 'btn_menu.png', help_menu)
         pygame.display.update()
         clock.tick(60)
 
@@ -164,9 +166,9 @@ def pvp_mode():
 def pvp_mode_2():
     name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
                                # потом нужно будет исправить
-                               [[(145, 500), 'select', 'btn.png', play_pvp_mode],
-                                [(515, 500), 'select', 'btn.png', play_pvp_mode],
-                                [(885, 500), 'select', 'btn.png', play_pvp_mode]
+                               [[(145, 500), 'start', 'btn.png', play_pvp_mode],
+                                [(515, 500), 'start', 'btn.png', play_pvp_mode],
+                                [(885, 500), 'start', 'btn.png', play_pvp_mode]
                                 ])
     name.run()
 
@@ -200,9 +202,9 @@ def buy_mage():
 def buy_warrior():
     """ Отрисовка самого меню """
     name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
                                 ])
     name.run()  # потом нужно будет исправить
 
@@ -210,9 +212,9 @@ def buy_warrior():
 def buy_archer():
     """ Отрисовка самого меню """
     name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'select', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'select', 'btn.png', story_mode_new_game_select_heroes]
+                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
+                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
                                 ])
     name.run()  # потом нужно будет исправить
 
@@ -251,7 +253,7 @@ class FunctionCallDrawing:
 
 
 def settings():
-    settings_background = load_image('background_2.jpg')
+    settings_background = load_image('background_5.jpg')
     volume_btn = SystemButton(400, 135)
     difficulty_btn = SystemButton(400, 135)
     language_btn = SystemButton(400, 135)
@@ -275,13 +277,13 @@ def settings():
         volume_btn.draw(460, 50, 'settings_btns.png', f'Volume {volume}%')
         difficulty_btn.draw(460, 200, 'settings_btns.png', f"Difficulty: {DIFFICULTY[change_difficult]}", 40)
         language_btn.draw(460, 350, 'settings_btns.png', f'Language: {LANGUAGES[select_lang]}')
-        about_btn.draw(460, 500, 'settings_btns.png', 'About', about_widget)
+        about_btn.draw(460, 500, 'About', 'settings_btns.png', about_widget)
 
-        quiet_btn.draw(500, 110, 'minus_btn.png', '', quiet_volume)
-        loud_btn.draw(780, 95, 'plus_btn.png', '', loud_volume)
-        easier_btn.draw(500, 260, 'minus_btn.png', '', reduce_difficult)
-        harder_btn.draw(780, 245, 'plus_btn.png', '', increase_difficult)
-        change_lang_btn.draw(780, 395, 'plus_btn.png', '', change_language)
+        quiet_btn.draw(500, 110, '', 'minus_btn.png', quiet_volume)
+        loud_btn.draw(780, 95, '', 'plus_btn.png', loud_volume)
+        easier_btn.draw(500, 260, '', 'minus_btn.png', reduce_difficult)
+        harder_btn.draw(780, 245, '', 'plus_btn.png', increase_difficult)
+        change_lang_btn.draw(780, 395, '', 'plus_btn.png', change_language)
 
         pygame.display.update()
 
@@ -305,7 +307,7 @@ def scores():
 
 
 def help_menu():
-    about = load_image('background_2.jpg')
+    about = load_image('background_5.jpg')
     show = True
     while show:
         for event in pygame.event.get():
