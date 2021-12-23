@@ -6,22 +6,53 @@ import pygame
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
-# screen = pygame.display.set_mode((1280, 720),
-# pygame.FULLSCREEN) с fullscreen не удобно при написании, потом поставим
+screen = pygame.display.set_mode((1280, 720),pygame.FULLSCREEN)
 
 SIZE = WIDTH, HEIGHT = 1280, 720
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
+#screen = pygame.display.set_mode((WIDTH, HEIGHT))
+left = False
+right = False
 volume = 60
 change_difficult = 0
 select_lang = 0
+animCount = 8
+
+
+def load_image(name, dictor='images', colorkey=None):
+    fullname = os.path.join(dictor, name)
+    # если файл не существует, то выходим
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
+walkRight = [pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_2.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_3.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_4.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_5.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_6.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_7.png', dictor='run'), (864, 384)),
+             pygame.transform.scale(load_image('run_8.png', dictor='run'), (864, 384))
+
+                 ]
+playerStand = pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384))
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
-def load_image(name, colorkey=None):
-    fullname = os.path.join('images', name)
+def load_image(name, dictor='images', colorkey=None):
+    fullname = os.path.join(dictor, name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -77,8 +108,8 @@ class SystemButton:
         font = pygame.font.Font(None, font_size)
         text = font.render(message, True, 'white')
         screen.blit(text,
-                    (x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
-
+                    (
+                    x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
 
 def show_menu(screen, clock):
@@ -173,12 +204,61 @@ def pvp_mode_2():
     name.run()
 
 
+x, y = -500, 230
+clock = pygame.time.Clock()
+
+
+def drawWindow(im):
+    global animCount
+
+    if animCount == 48:
+        animCount = 0
+        print(1)
+
+    screen.blit(walkRight[animCount // 6], (x, y))
+
+
+
 def game():
-    pass
+    global x, y, animCount
+    menu_background = pygame.image.load('images/game.jpg')
+    running = True
+    speed = 5
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            x += speed
+            left = True
+            right = False
+            animCount += 1
+        elif keys[pygame.K_LEFT]:
+            x -= speed
+            left = False
+            right = True
+        else:
+            left = False
+            right = False
+            animCount = 0
+
+        screen.blit(menu_background, (0, 0))
+        drawWindow(menu_background)
+        pygame.display.update()
+        clock.tick(60)
 
 
 def play_pvp_mode():
-    pass
+    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
+                               [[(145, 500), 'select', 'btn.png', buy_mage],
+                                [(515, 500), 'select', 'btn.png', buy_warrior],
+                                [(885, 500), 'select', 'btn.png', buy_archer]
+                                ])
+    name.run()
 
 
 def store_mode():
