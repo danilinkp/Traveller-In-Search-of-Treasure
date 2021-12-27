@@ -1,15 +1,16 @@
 import logging
 from time import sleep
+from Test_Hero import MonkHero
 import os
 import sys
 import pygame
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
-screen = pygame.display.set_mode((1280, 720),pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1280, 720),pygame.FULLSCREEN)
 
 SIZE = WIDTH, HEIGHT = 1280, 720
-#screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 left = False
 right = False
 volume = 60
@@ -35,20 +36,14 @@ def load_image(name, dictor='images', colorkey=None):
     return image
 
 
-walkRight = [pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_2.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_3.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_4.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_5.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_6.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_7.png', dictor='run'), (864, 384)),
-             pygame.transform.scale(load_image('run_8.png', dictor='run'), (864, 384))
-
-                 ]
 playerStand = pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384))
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
+
+
+def rotate(elems):
+    pass
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -109,7 +104,8 @@ class SystemButton:
         text = font.render(message, True, 'white')
         screen.blit(text,
                     (
-                    x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
+                        x + ((self.width - text.get_width()) // 2),
+                        y + ((self.height - text.get_height()) // 2)))
 
 
 def show_menu(screen, clock):
@@ -204,52 +200,7 @@ def pvp_mode_2():
     name.run()
 
 
-x, y = -500, 230
 clock = pygame.time.Clock()
-
-
-def drawWindow(im):
-    global animCount
-
-    if animCount == 48:
-        animCount = 0
-        print(1)
-
-    screen.blit(walkRight[animCount // 6], (x, y))
-
-
-
-def game():
-    global x, y, animCount
-    menu_background = pygame.image.load('images/game.jpg')
-    running = True
-    speed = 5
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_RIGHT]:
-            x += speed
-            left = True
-            right = False
-            animCount += 1
-        elif keys[pygame.K_LEFT]:
-            x -= speed
-            left = False
-            right = True
-        else:
-            left = False
-            right = False
-            animCount = 0
-
-        screen.blit(menu_background, (0, 0))
-        drawWindow(menu_background)
-        pygame.display.update()
-        clock.tick(60)
 
 
 def play_pvp_mode():
@@ -467,10 +418,78 @@ def about_widget():
         pygame.display.update()
 
 
+def game():
+    menu_background = pygame.image.load('images/game.jpg')
+    running = True
+    x = -384
+    y = 230
+    speed = 9
+    Monk = MonkHero(screen, x, y, speed)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.KEYUP:
+                if not Monk.isJump:
+                    if event.key == pygame.K_z:
+                        Monk.first_attack()
+
+                    if event.key == pygame.K_x:
+                        Monk.second_attack()
+
+                    if event.key == pygame.K_c:
+                        Monk.third_attack()
+
+                    if event.key == pygame.K_r:
+                        Monk.ultimate_attack()
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # левая кнопка мыши
+                    if not Monk.isJump:
+                        Monk.first_attack()
+
+                if event.button == 3:  # правая кнопка мыши
+                    if not Monk.isJump:
+                        Monk.defend_el()
+
+        keys = pygame.key.get_pressed()
+        if not Monk.f_atk_flag and not Monk.s_atk_flag and not Monk.t_atk_flag and not Monk.defend_f:
+            if keys[pygame.K_d] and Monk.get_pos()[0] < 1280 - 384 - 100:
+                Monk.horizontal_movement(False, True)
+                Monk.count_fun()
+            elif keys[pygame.K_a] and Monk.get_pos()[0] > -400:
+                Monk.horizontal_movement(True, False)
+                Monk.count_fun()
+
+
+
+            elif Monk.meditate_f:
+                Monk.count_fun()
+
+            else:
+                Monk.idle_pos()
+
+            if not Monk.isJump:
+                if keys[pygame.K_SPACE]:
+                    Monk.isJump = True
+            else:
+                Monk.jump()
+
+        screen.blit(menu_background, (0, 0))
+        #   print(Monk.get_flags())
+        Monk.run()
+
+        pygame.display.update()
+        clock.tick(60)
+
+
 def terminate():
     pygame.quit()
     sys.exit()
 
 
 if __name__ == '__main__':
-    start_menu()
+    game()
