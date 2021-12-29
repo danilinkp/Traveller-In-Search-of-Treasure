@@ -21,7 +21,7 @@ animCount = 8
 
 def load_image(name, dictor='images', colorkey=None):
     fullname = os.path.join(dictor, name)
-    # если файл не существует, то выходим
+    # если файл не существует   , то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -422,7 +422,7 @@ def game():
     menu_background = pygame.image.load('images/game.jpg')
     running = True
     x = -384
-    y = 230
+    y = 110
     speed = 9
     Monk = MonkHero(screen, x, y, speed)
 
@@ -456,7 +456,7 @@ def game():
                         Monk.defend_el()
 
         keys = pygame.key.get_pressed()
-        if not Monk.f_atk_flag and not Monk.s_atk_flag and not Monk.t_atk_flag and not Monk.defend_f:
+        if not any([Monk.f_atk_flag, Monk.s_atk_flag, Monk.t_atk_flag, Monk.defend_f, Monk.ultimate_f]):
             if keys[pygame.K_d] and Monk.get_pos()[0] < 1280 - 384 - 100:
                 Monk.horizontal_movement(False, True)
                 Monk.count_fun()

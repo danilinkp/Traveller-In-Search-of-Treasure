@@ -14,147 +14,180 @@ class MonkHero(Hero):
         self.x = x
         self.y = y
         self.jumpcount = 8
+        self.scale = 4
 
-        self.walkRight = [pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_2.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_3.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_4.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_5.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_6.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_7.png', dictor='run'), (864, 384)),
-                          pygame.transform.scale(load_image('run_8.png', dictor='run'), (864, 384))]
+        self.walkRight = [load_image('run_1.png', dictor='run'),
+                          load_image('run_2.png', dictor='run'),
+                          load_image('run_3.png', dictor='run'),
+                          load_image('run_4.png', dictor='run'),
+                          load_image('run_5.png', dictor='run'),
+                          load_image('run_6.png', dictor='run'),
+                          load_image('run_7.png', dictor='run'),
+                          load_image('run_8.png', dictor='run')]
+        self.walkRight = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.walkRight]
 
         self.walkLeft = [pygame.transform.flip(i, True, False) for i in self.walkRight]
 
-        self.idle = [pygame.transform.scale(load_image('idle_1.png', dictor='idle'), (864, 384)),
-                     pygame.transform.scale(load_image('idle_2.png', dictor='idle'), (864, 384)),
-                     pygame.transform.scale(load_image('idle_3.png', dictor='idle'), (864, 384)),
-                     pygame.transform.scale(load_image('idle_4.png', dictor='idle'), (864, 384)),
-                     pygame.transform.scale(load_image('idle_5.png', dictor='idle'), (864, 384)),
-                     pygame.transform.scale(load_image('idle_6.png', dictor='idle'), (864, 384))]
+        self.idle = [load_image('idle_1.png', dictor='idle'),
+                     load_image('idle_2.png', dictor='idle'),
+                     load_image('idle_3.png', dictor='idle'),
+                     load_image('idle_4.png', dictor='idle'),
+                     load_image('idle_5.png', dictor='idle'),
+                     load_image('idle_6.png', dictor='idle')]
+        self.idle = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.idle]
 
-        self.j_up = [pygame.transform.scale(load_image('j_up_1.png', dictor='j_up'), (864, 384)),
-                     pygame.transform.scale(load_image('j_up_2.png', dictor='j_up'), (864, 384)),
-                     pygame.transform.scale(load_image('j_up_3.png', dictor='j_up'), (864, 384))]
 
-        self.j_down = [pygame.transform.scale(load_image('j_down_1.png', dictor='j_down'), (864, 384)),
-                       pygame.transform.scale(load_image('j_down_2.png', dictor='j_down'), (864, 384)),
-                       pygame.transform.scale(load_image('j_down_3.png', dictor='j_down'), (864, 384))]
+        self.j_up = [load_image('j_up_1.png', dictor='j_up'),
+                     load_image('j_up_2.png', dictor='j_up'),
+                     load_image('j_up_3.png', dictor='j_up')]
+        self.j_up = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.j_up]
 
-        self.f_atk_r = [pygame.transform.scale(load_image('1_atk_1.png', dictor='1_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('1_atk_2.png', dictor='1_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('1_atk_3.png', dictor='1_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('1_atk_4.png', dictor='1_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('1_atk_5.png', dictor='1_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('1_atk_6.png', dictor='1_atk'), (864, 384))]
+        self.j_down = [load_image('j_down_1.png', dictor='j_down'),
+                       load_image('j_down_2.png', dictor='j_down'),
+                       load_image('j_down_3.png', dictor='j_down')]
+
+        self.j_down = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.j_down]
+
+        self.f_atk_r = [load_image('1_atk_1.png', dictor='1_atk'),
+                        load_image('1_atk_2.png', dictor='1_atk'),
+                        load_image('1_atk_3.png', dictor='1_atk'),
+                        load_image('1_atk_4.png', dictor='1_atk'),
+                        load_image('1_atk_5.png', dictor='1_atk'),
+                        load_image('1_atk_6.png', dictor='1_atk')]
+
+        self.f_atk_r = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.f_atk_r]
         self.f_atk_l = [pygame.transform.flip(i, True, False) for i in self.f_atk_r]
 
-        self.s_atk_r = [pygame.transform.scale(load_image('2_atk_1.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_2.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_3.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_4.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_5.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_6.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_7.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_8.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_9.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_10.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_11.png', dictor='2_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('2_atk_12.png', dictor='2_atk'), (864, 384))
-                        ]
+        self.s_atk_r = [load_image('2_atk_1.png', dictor='2_atk'),
+                        load_image('2_atk_2.png', dictor='2_atk'),
+                        load_image('2_atk_3.png', dictor='2_atk'),
+                        load_image('2_atk_4.png', dictor='2_atk'),
+                        load_image('2_atk_5.png', dictor='2_atk'),
+                        load_image('2_atk_6.png', dictor='2_atk'),
+                        load_image('2_atk_7.png', dictor='2_atk'),
+                        load_image('2_atk_8.png', dictor='2_atk'),
+                        load_image('2_atk_9.png', dictor='2_atk'),
+                        load_image('2_atk_10.png', dictor='2_atk'),
+                        load_image('2_atk_11.png', dictor='2_atk'),
+                        load_image('2_atk_12.png', dictor='2_atk')]
+        self.s_atk_r = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.s_atk_r]
         self.s_atk_l = [pygame.transform.flip(i, True, False) for i in self.s_atk_r]
 
-        self.t_atk_r = [pygame.transform.scale(load_image('3_atk_1.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_2.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_3.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_4.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_5.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_6.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_7.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_8.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_9.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_10.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_11.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_12.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_13.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_14.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_15.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_16.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_17.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_18.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_19.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_20.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_21.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_22.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_23.png', dictor='3_atk'), (864, 384)),
-                        pygame.transform.scale(load_image('3_atk_24.png', dictor='3_atk'), (864, 384))
+        self.t_atk_r = [load_image('3_atk_1.png', dictor='3_atk'),
+                        load_image('3_atk_2.png', dictor='3_atk'),
+                        load_image('3_atk_3.png', dictor='3_atk'),
+                        load_image('3_atk_4.png', dictor='3_atk'),
+                        load_image('3_atk_5.png', dictor='3_atk'),
+                        load_image('3_atk_6.png', dictor='3_atk'),
+                        load_image('3_atk_7.png', dictor='3_atk'),
+                        load_image('3_atk_8.png', dictor='3_atk'),
+                        load_image('3_atk_9.png', dictor='3_atk'),
+                        load_image('3_atk_10.png', dictor='3_atk'),
+                        load_image('3_atk_11.png', dictor='3_atk'),
+                        load_image('3_atk_12.png', dictor='3_atk'),
+                        load_image('3_atk_13.png', dictor='3_atk'),
+                        load_image('3_atk_14.png', dictor='3_atk'),
+                        load_image('3_atk_15.png', dictor='3_atk'),
+                        load_image('3_atk_16.png', dictor='3_atk'),
+                        load_image('3_atk_17.png', dictor='3_atk'),
+                        load_image('3_atk_18.png', dictor='3_atk'),
+                        load_image('3_atk_19.png', dictor='3_atk'),
+                        load_image('3_atk_20.png', dictor='3_atk'),
+                        load_image('3_atk_21.png', dictor='3_atk'),
+                        load_image('3_atk_22.png', dictor='3_atk'),
+                        load_image('3_atk_23.png', dictor='3_atk'),
+                        load_image('3_atk_24.png', dictor='3_atk'),
                         ]
+        self.t_atk_r = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.t_atk_r]
         self.t_atk_l = [pygame.transform.flip(i, True, False) for i in self.t_atk_r]
 
-        self.ultimate_r = [pygame.transform.scale(load_image('sp_atk_1.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_2.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_3.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_4.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_5.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_6.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_7.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_8.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_9.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_10.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_11.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_12.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_13.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_14.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_15.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_16.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_17.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_18.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_19.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_20.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_21.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_22.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_23.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_24.png', dictor='sp_atk'), (864, 384)),
-                           pygame.transform.scale(load_image('sp_atk_25.png', dictor='sp_atk'), (864, 384))
+        self.ultimate_r = [load_image('sp_atk_1.png', dictor='sp_atk'),
+                           load_image('sp_atk_2.png', dictor='sp_atk'),
+                           load_image('sp_atk_3.png', dictor='sp_atk'),
+                           load_image('sp_atk_4.png', dictor='sp_atk'),
+                           load_image('sp_atk_5.png', dictor='sp_atk'),
+                           load_image('sp_atk_6.png', dictor='sp_atk'),
+                           load_image('sp_atk_7.png', dictor='sp_atk'),
+                           load_image('sp_atk_8.png', dictor='sp_atk'),
+                           load_image('sp_atk_9.png', dictor='sp_atk'),
+                           load_image('sp_atk_10.png', dictor='sp_atk'),
+                           load_image('sp_atk_11.png', dictor='sp_atk'),
+                           load_image('sp_atk_12.png', dictor='sp_atk'),
+                           load_image('sp_atk_13.png', dictor='sp_atk'),
+                           load_image('sp_atk_14.png', dictor='sp_atk'),
+                           load_image('sp_atk_15.png', dictor='sp_atk'),
+                           load_image('sp_atk_16.png', dictor='sp_atk'),
+                           load_image('sp_atk_17.png', dictor='sp_atk'),
+                           load_image('sp_atk_18.png', dictor='sp_atk'),
+                           load_image('sp_atk_19.png', dictor='sp_atk'),
+                           load_image('sp_atk_20.png', dictor='sp_atk'),
+                           load_image('sp_atk_21.png', dictor='sp_atk'),
+                           load_image('sp_atk_22.png', dictor='sp_atk'),
+                           load_image('sp_atk_23.png', dictor='sp_atk'),
+                           load_image('sp_atk_24.png', dictor='sp_atk'),
+                           load_image('sp_atk_25.png', dictor='sp_atk')
                            ]
+        self.ultimate_r = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.ultimate_r]
         self.ultimate_l = [pygame.transform.flip(i, True, False) for i in self.ultimate_r]
 
         self.meditate_s = [
-            pygame.transform.scale(load_image('meditate_1.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_2.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_3.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_4.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_5.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_6.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_7.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_8.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_9.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_10.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_11.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_12.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_13.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_14.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_15.png', dictor='meditate'), (864, 384)),
-            pygame.transform.scale(load_image('meditate_16.png', dictor='meditate'), (864, 384)),
+            load_image('meditate_1.png', dictor='meditate'),
+            load_image('meditate_2.png', dictor='meditate'),
+            load_image('meditate_3.png', dictor='meditate'),
+            load_image('meditate_4.png', dictor='meditate'),
+            load_image('meditate_5.png', dictor='meditate'),
+            load_image('meditate_6.png', dictor='meditate'),
+            load_image('meditate_7.png', dictor='meditate'),
+            load_image('meditate_8.png', dictor='meditate'),
+            load_image('meditate_9.png', dictor='meditate'),
+            load_image('meditate_10.png', dictor='meditate'),
+            load_image('meditate_11.png', dictor='meditate'),
+            load_image('meditate_12.png', dictor='meditate'),
+            load_image('meditate_13.png', dictor='meditate'),
+            load_image('meditate_14.png', dictor='meditate'),
+            load_image('meditate_15.png', dictor='meditate'),
+            load_image('meditate_16.png', dictor='meditate')
 
         ]
+        self.meditate_s = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.meditate_s]
 
         self.defend_r = [
-            pygame.transform.scale(load_image('defend_1.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_2.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_3.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_4.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_5.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_6.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_7.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_8.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_9.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_10.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_11.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_12.png', dictor='defend'), (864, 384)),
-            pygame.transform.scale(load_image('defend_13.png', dictor='defend'), (864, 384))
+            load_image('defend_1.png', dictor='defend'),
+            load_image('defend_2.png', dictor='defend'),
+            load_image('defend_3.png', dictor='defend'),
+            load_image('defend_4.png', dictor='defend'),
+            load_image('defend_5.png', dictor='defend'),
+            load_image('defend_6.png', dictor='defend'),
+            load_image('defend_7.png', dictor='defend'),
+            load_image('defend_8.png', dictor='defend'),
+            load_image('defend_9.png', dictor='defend'),
+            load_image('defend_10.png', dictor='defend'),
+            load_image('defend_11.png', dictor='defend'),
+            load_image('defend_12.png', dictor='defend'),
+            load_image('defend_13.png', dictor='defend')
 
         ]
+        self.defend_r = [
+            pygame.transform.scale(i, (int(i.get_width() * self.scale), int(i.get_height() * self.scale))) for
+            i in self.defend_r]
 
         self.defend_l = [pygame.transform.flip(i, True, False) for i in self.defend_r]
 
@@ -254,8 +287,6 @@ class MonkHero(Hero):
 
                     self.screen.blit(self.idle[self.animCount // 6], (self.x, self.y))
 
-
-
     def count_fun(self):
         self.animCount += 1
 
@@ -318,7 +349,6 @@ class MonkHero(Hero):
         if not self.ultimate_f:
             self.ultimate_f = True
             self.animCount = 0
-
 
 
 def load_image(name, dictor='images', colorkey=None):
