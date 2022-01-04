@@ -1,6 +1,9 @@
 import logging
 from time import sleep
-from Test_Hero import MonkHero
+
+import pytmx
+
+
 import os
 import sys
 import pygame
@@ -17,6 +20,7 @@ volume = 60
 change_difficult = 0
 select_lang = 0
 animCount = 8
+all_sprites = pygame.sprite.Group()
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -419,71 +423,45 @@ def about_widget():
 
 
 def game():
-    menu_background = pygame.image.load('images/game.jpg')
     running = True
-    x = -384
-    y = 110
-    speed = 9
-    Monk = MonkHero(screen, x, y, speed)
+    clock = pygame.time.Clock()
+
+    running = True
 
     while running:
+        screen.fill((0, 0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
             if event.type == pygame.KEYUP:
-                if not Monk.isJump:
-                    if event.key == pygame.K_z:
-                        Monk.first_attack()
-
-                    if event.key == pygame.K_x:
-                        Monk.second_attack()
-
-                    if event.key == pygame.K_c:
-                        Monk.third_attack()
-
-                    if event.key == pygame.K_r:
-                        Monk.ultimate_attack()
-
-            if event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:  # левая кнопка мыши
-                    if not Monk.isJump:
-                        Monk.first_attack()
-
-                if event.button == 3:  # правая кнопка мыши
-                    if not Monk.isJump:
-                        Monk.defend_el()
+                if event.key == pygame.K_SPACE:
+                    pass
 
         keys = pygame.key.get_pressed()
-        if not any([Monk.f_atk_flag, Monk.s_atk_flag, Monk.t_atk_flag, Monk.defend_f, Monk.ultimate_f]):
-            if keys[pygame.K_d] and Monk.get_pos()[0] < 1280 - 384 - 100:
-                Monk.horizontal_movement(False, True)
-                Monk.count_fun()
-            elif keys[pygame.K_a] and Monk.get_pos()[0] > -400:
-                Monk.horizontal_movement(True, False)
-                Monk.count_fun()
+        if keys[pygame.K_d]:
+            pass
 
 
 
-            elif Monk.meditate_f:
-                Monk.count_fun()
 
-            else:
-                Monk.idle_pos()
 
-            if not Monk.isJump:
-                if keys[pygame.K_SPACE]:
-                    Monk.isJump = True
-            else:
-                Monk.jump()
+        elif keys[pygame.K_a]:
+            pass
 
-        screen.blit(menu_background, (0, 0))
-        #   print(Monk.get_flags())
-        Monk.run()
+
+        else:
+            pass
 
         pygame.display.update()
+
         clock.tick(60)
+
+
+def get_event(sprite, event):
+    if sprite.rect.collidepoint(event.pos):
+        print(10)
 
 
 def terminate():
