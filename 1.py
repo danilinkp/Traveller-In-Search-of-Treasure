@@ -3,6 +3,7 @@ from time import sleep
 import os
 import sys
 import pygame
+import pytmx
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
@@ -35,6 +36,17 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+def built_all_tiles(screen, tmxdata, world_offset):
+    print(tmxdata)
+    for layer in tmxdata:
+        print(layer)
+        for tile in layer.tiles():
+            x_pixel = tile[0] * 32 + world_offset[0]
+            y_pixel = tile[1] * 32 + world_offset[1]
+            print(tile)
+            screen.blit(tile[2], (x_pixel, y_pixel))
 
 
 class Button:
@@ -167,7 +179,23 @@ def pvp_mode_2():
 
 
 def game():
-    pass
+    tmxdata = pytmx.load_pygame('maps/dab.tmx')
+    height = tmxdata.height
+    width = tmxdata.width
+    tile_size = tmxdata.tilewidth
+    for y in range(height):
+        for x in range(width):
+            image = tmxdata.get_tile_image(x, y, 0)
+            screen.blit(image, (x * tile_size, y * tile_size))
+    # world_offset = [200, 0]
+    show = True
+    while show:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
 
 
 def play_pvp_mode():

@@ -1,0 +1,209 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet"
+    ],
+    "file.lastUsedOpenFilter": "Все файлы (*)",
+    "fileStates": {
+        "1 карта.tsx": {
+            "scaleInDock": 1
+        },
+        "Background.tsx": {
+            "scaleInDock": 0.0625,
+            "scaleInEditor": 1
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/1 карта.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/clouds.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/dab.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 533,
+                "y": 452
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/far-grounds.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/first_map.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1583.3333333333335,
+                "y": 1596.969696969697
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/magic-cliffs-PREVIEWx1.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/map1.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 727,
+                "y": 394
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/map2.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 863.3333333333333,
+                "y": 556
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/sea.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/sky.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/test_map.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1711.333333333333,
+                "y": 959.3333333333333
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/безымянный.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 623.3333333333333,
+                "y": 144
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/тайлс16_32.tsx": {
+            "scaleInDock": 0.1,
+            "scaleInEditor": 1.5
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/Background.tsx": {
+            "scaleInDock": 0.33,
+            "scaleInEditor": 1
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/test-map.tmx": {
+            "scale": 0.43224999999999997,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 864.0832851359169,
+                "y": 347.0213996529786
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/test_tiles.tsx": {
+            "scaleInDock": 1
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/tet.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1171.2121212121212,
+                "y": 336.3636363636364
+            }
+        },
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/tileset.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "clouds.tsx": {
+            "scaleInDock": 1
+        },
+        "first_map_tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "magic-cliffs-PREVIEWx1.tsx": {
+            "scaleInDock": 1
+        },
+        "map.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 799,
+                "y": 399
+            }
+        },
+        "map2.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 800,
+                "y": 399.33333333333326
+            }
+        },
+        "sea.tsx": {
+            "scaleInDock": 1
+        },
+        "sky.tsx": {
+            "scaleInDock": 1
+        },
+        "test-map.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 594,
+                "y": 413.33333333333326
+            }
+        },
+        "test_map.tmx": {
+            "scale": 0.2644129672897196,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1715.1201192908823,
+                "y": 960.6185453139669
+            }
+        },
+        "test_tiles.tsx": {
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "тайлс16_32.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "D:/ЯНДЕКС ЛИЦЕЙ/pygame-project/maps",
+    "last.imagePath": "D:/ЯНДЕКС ЛИЦЕЙ/pygame-project/maps",
+    "map.height": 24,
+    "map.lastUsedExportFilter": "Все файлы (*)",
+    "map.lastUsedFormat": "tmx",
+    "map.layerDataFormat": null,
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
+    "map.width": 80,
+    "openFiles": [
+    ],
+    "project": "maps.tiled-project",
+    "recentFiles": [
+        "first_map_tiles.tsx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/tet.tmx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/Background.tsx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/tileset.tsx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet/test-map.tmx",
+        "test_tiles.tsx",
+        "map2.tmx",
+        "Background.tsx",
+        "test-map.tmx",
+        "test_map.tmx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/first_map.tmx",
+        "D:/ЯНДЕКС ЛИЦЕЙ/maps/1 карта.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    }
+}
