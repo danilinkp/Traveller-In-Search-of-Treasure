@@ -1,12 +1,14 @@
-import logging
-from time import sleep
-
-import pytmx
-
-
 import os
-import sys
 import pygame
+import sys
+
+from settings import *
+
+from tiles import Tile
+from settings import tile_size, screen_width
+from player import Traveler
+from particles import ParticleEffect
+
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
@@ -21,6 +23,7 @@ change_difficult = 0
 select_lang = 0
 animCount = 8
 all_sprites = pygame.sprite.Group()
+MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -40,31 +43,13 @@ def load_image(name, dictor='images', colorkey=None):
     return image
 
 
-playerStand = pygame.transform.scale(load_image('run_1.png', dictor='run'), (864, 384))
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
-MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
+#MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
 def rotate(elems):
     pass
-
-
-def load_image(name, dictor='images', colorkey=None):
-    fullname = os.path.join(dictor, name)
-    # если файл не существует, то выходим
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
 
 
 class Button:
@@ -286,6 +271,141 @@ class FunctionCallDrawing:
                                      self.name_coords_fun[i][3])
             pygame.display.update()
 
+class Level:
+    def __init__(self, level_data, surface):  # Принимает карту(список) и  скрин
+
+        # level setup
+        self.travaler = None  # по умолчанию None, пока не будет вызван класс
+
+        self.tiles = pygame.sprite.Group()  # группа плиток
+        self.player_group = pygame.sprite.GroupSingle()  # группа с героем
+        self.screen = surface  # скрин
+        self.setup_level(level_data)  # добавление карты
+        self.world_shift = 0  # скорость передвижения камеры
+        self.current_x = 150
+
+        self.dust_sprite = pygame.sprite.GroupSingle()  # группа с частицами
+        self.player_on_ground = False
+
+    def create_jump_particles(self, pos):
+        if self.travaler.direction_to_the_right:
+            jump_particle_sprite = ParticleEffect((pos[0] - 10, pos[1] - 5), 'jump')
+            self.dust_sprite.add(jump_particle_sprite)
+        else:
+            jump_particle_sprite = ParticleEffect((pos[0] + 10, pos[1] - 5), 'jump')
+            self.dust_sprite.add(jump_particle_sprite)
+
+    def get_player_on_ground(self):
+        if self.travaler.on_ground:
+            self.player_on_ground = True
+        else:
+            self.player_on_ground = False
+
+    def create_landing_dust(self):
+        if not self.player_on_ground and self.travaler.on_ground \
+                and not self.dust_sprite.sprites():
+
+            if self.travaler.direction_to_the_right:
+
+                fall_dust_particle = ParticleEffect((self.travaler.rect.midbottom[0] - 10,
+                                                     self.travaler.rect.midbottom[1] - 15), 'land')
+
+            else:
+
+                fall_dust_particle = ParticleEffect(
+                    (self.travaler.rect.midbottom[0] + 10, self.travaler.rect.midbottom[1] - 15), 'land')
+            self.dust_sprite.add(fall_dust_particle)
+
+    def setup_level(self, layout):  # расстановка
+
+        for row_index, row in enumerate(layout):
+            for col_index, cell in enumerate(row):
+                x = col_index * tile_size
+                y = row_index * tile_size
+
+                if cell == 'X':
+                    tile = Tile((x, y), tile_size)
+                    self.tiles.add(tile)
+                if cell == 'P':
+                    self.travaler = Traveler((x, y), self.screen, self.create_jump_particles)
+                    self.player_group.add(self.travaler)
+
+    def scroll_x(self):
+        player_x = self.travaler.rect.centerx
+        direction_x = self.travaler.direction
+
+        if player_x < screen_width / 2 and direction_x[0] < 0:
+            self.world_shift = 8
+            self.travaler.speed = 0
+        elif player_x > screen_width - (screen_width / 2) and direction_x[0] > 0:
+            self.world_shift = -8
+            self.travaler.speed = 0
+        else:
+            self.world_shift = 0
+            self.travaler.speed = 8
+
+    def horizontal_movement_collision(self):
+
+        self.travaler.rect.x += self.travaler.direction[0] * self.travaler.speed
+        print(self.travaler.rect.x)
+
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(self.travaler.rect):
+                if self.travaler.direction[0] < 0:
+                    self.travaler.rect.left = sprite.rect.right
+                    self.travaler.on_left = True
+                    self.current_x = self.travaler.rect.left
+                elif self.travaler.direction[0] > 0:
+                    self.travaler.rect.right = sprite.rect.left
+                    self.travaler.on_right = True
+                    self.current_x = self.travaler.rect.right
+
+        if self.travaler.on_left and (self.travaler.rect.left < self.current_x
+                                      or self.travaler.direction[0] >= 0):
+            self.travaler.on_left = False
+        if self.travaler.on_right and (self.travaler.rect.right > self.current_x
+                                       or self.travaler.direction[0] <= 0):
+            self.travaler.on_right = False
+
+    def vertical_movement_collision(self):
+
+        self.travaler.apply_gravity()
+
+        for sprite in self.tiles.sprites():
+            if sprite.rect.colliderect(self.travaler.rect):
+                if self.travaler.direction[1] > 0:
+                    self.travaler.rect.bottom = sprite.rect.top
+                    self.travaler.direction[1] = 0
+                    self.travaler.on_ground = True
+                elif self.travaler.direction[1] < 0:
+                    self.travaler.rect.top = sprite.rect.bottom
+                    self.travaler.direction[1] = 0
+                    self.travaler.on_ceiling = True
+
+        if self.travaler.on_ground and self.travaler.direction[1] < 0 or self.travaler.direction[1] > 1:
+            self.travaler.on_ground = False
+        if self.travaler.on_ceiling and self.travaler.direction[1] > 0.1:
+            self.travaler.on_ceiling = False
+
+    def run(self):
+        # частицы
+        self.dust_sprite.update(self.world_shift)
+        self.dust_sprite.draw(self.screen)
+
+        # плитки
+        self.tiles.update(self.world_shift)
+        self.tiles.draw(self.screen)
+        self.scroll_x()
+
+        # игрок
+        self.player_group.update()
+        self.horizontal_movement_collision()
+        self.get_player_on_ground()
+        self.vertical_movement_collision()
+        self.create_landing_dust()
+        self.player_group.draw(self.screen)
+
+
 
 def settings():
     settings_background = load_image('background_5.jpg')
@@ -424,38 +544,19 @@ def about_widget():
 
 def game():
     running = True
-    clock = pygame.time.Clock()
 
-    running = True
+    level = Level(level_map, screen)
 
     while running:
-        screen.fill((0, 0, 0))
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    pass
+                sys.exit()
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_d]:
-            pass
-
-
-
-
-
-        elif keys[pygame.K_a]:
-            pass
-
-
-        else:
-            pass
+        screen.fill('black')
+        level.run()
 
         pygame.display.update()
-
         clock.tick(60)
 
 
@@ -470,4 +571,4 @@ def terminate():
 
 
 if __name__ == '__main__':
-    game()
+    show_menu(screen, clock)
