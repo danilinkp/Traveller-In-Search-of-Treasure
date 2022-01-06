@@ -45,7 +45,7 @@ def load_image(name, dictor='images', colorkey=None):
 
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
-#MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
+MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
 def rotate(elems):
@@ -571,4 +571,4 @@ def terminate():
 
 
 if __name__ == '__main__':
-    show_menu(screen, clock)
+    start_menu()
