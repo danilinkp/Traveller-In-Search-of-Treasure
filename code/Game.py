@@ -2,6 +2,9 @@ import os
 import pygame
 import sys
 
+import pytmx
+
+from Mobs import Mob
 from settings import *
 
 from tiles import Tile
@@ -9,13 +12,12 @@ from settings import tile_size, screen_width
 from player import Traveler
 from particles import ParticleEffect
 
-
 pygame.init()
 pygame.display.set_caption('pygame-project')
-# screen = pygame.display.set_mode((1280, 720),pygame.FULLSCREEN)
 
-SIZE = WIDTH, HEIGHT = 1280, 720
+SIZE = WIDTH, HEIGHT = 1280, 764
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+# screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)
 left = False
 right = False
 volume = 60
@@ -24,6 +26,7 @@ select_lang = 0
 animCount = 8
 all_sprites = pygame.sprite.Group()
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
+pos_of_player = [256, 448]
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -271,21 +274,32 @@ class FunctionCallDrawing:
                                      self.name_coords_fun[i][3])
             pygame.display.update()
 
+
 class Level:
-    def __init__(self, level_data, surface):  # Принимает карту(список) и  скрин
+    def __init__(self, path, surface):  # Принимает карту(список) и  скрин
 
         # level setup
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
 
+        self.decorations = pygame.sprite.Group()
         self.tiles = pygame.sprite.Group()  # группа плиток
         self.player_group = pygame.sprite.GroupSingle()  # группа с героем
+        self.enemies = pygame.sprite.Group()
         self.screen = surface  # скрин
-        self.setup_level(level_data)  # добавление карты
+         # добавление карты
         self.world_shift = 0  # скорость передвижения камеры
         self.current_x = 150
 
         self.dust_sprite = pygame.sprite.GroupSingle()  # группа с частицами
         self.player_on_ground = False
+        self.path = path
+        self.map = pytmx.load_pygame("maps/level.tmx")
+        self.num_of_layers = len(self.map.layers)
+        print(self.num_of_layers)
+        self.height_map = self.map.height
+        self.width_map = self.map.width
+        self.tile_size = self.map.tilewidth * 2
+        self.render()
 
     def create_jump_particles(self, pos):
         if self.travaler.direction_to_the_right:
@@ -316,19 +330,46 @@ class Level:
                     (self.travaler.rect.midbottom[0] + 10, self.travaler.rect.midbottom[1] - 15), 'land')
             self.dust_sprite.add(fall_dust_particle)
 
-    def setup_level(self, layout):  # расстановка
 
-        for row_index, row in enumerate(layout):
-            for col_index, cell in enumerate(row):
-                x = col_index * tile_size
-                y = row_index * tile_size
+    def render(self):
+        print(self.height_map, self.width_map)
+        self.travaler = Traveler((720, 200), self.screen, self.create_jump_particles)
+        self.player_group.add(self.travaler)
+        pos = 256, 448
+        enemy = Mob(pos, self.tile_size)
+        self.enemies.add(enemy)
+        for y in range(self.height_map):
+            for x in range(self.width_map):
+                for i in range(self.num_of_layers):
+                    image = self.map.get_tile_image(x, y, i)
+                    #          print(image)
+                    x_1 = x * self.tile_size
+                    y_1 = y * self.tile_size
+                 #   print(x_1, y_1)
 
-                if cell == 'X':
-                    tile = Tile((x, y), tile_size)
-                    self.tiles.add(tile)
-                if cell == 'P':
-                    self.travaler = Traveler((x, y), self.screen, self.create_jump_particles)
-                    self.player_group.add(self.travaler)
+                    if image:
+
+
+
+                            if i == 5 or i == 4:
+                                image = pygame.transform.scale(image,
+                                                               (
+                                                                   image.get_width() * 2,
+                                                                   image.get_height() * 2))
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+                                self.tiles.add(tile)
+                            else:
+                                image = pygame.transform.scale(image,
+                                                               (
+                                                                   image.get_width() * 2,
+                                                                   image.get_height() * 2))
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+                                self.decorations.add(tile)
+
+                    # if image:
+                    #    image = pygame.transform.scale(image,
+                    #                          (image.get_width() * 2, image.get_height() * 2))
+                    #  screen.blit(image, (x * self.tile_size, y * self.tile_size))
 
     def scroll_x(self):
         player_x = self.travaler.rect.centerx
@@ -345,9 +386,7 @@ class Level:
             self.travaler.speed = 8
 
     def horizontal_movement_collision(self):
-
         self.travaler.rect.x += self.travaler.direction[0] * self.travaler.speed
-        print(self.travaler.rect.x)
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(self.travaler.rect):
@@ -355,6 +394,7 @@ class Level:
                     self.travaler.rect.left = sprite.rect.right
                     self.travaler.on_left = True
                     self.current_x = self.travaler.rect.left
+
                 elif self.travaler.direction[0] > 0:
                     self.travaler.rect.right = sprite.rect.left
                     self.travaler.on_right = True
@@ -363,12 +403,12 @@ class Level:
         if self.travaler.on_left and (self.travaler.rect.left < self.current_x
                                       or self.travaler.direction[0] >= 0):
             self.travaler.on_left = False
+
         if self.travaler.on_right and (self.travaler.rect.right > self.current_x
                                        or self.travaler.direction[0] <= 0):
             self.travaler.on_right = False
 
     def vertical_movement_collision(self):
-
         self.travaler.apply_gravity()
 
         for sprite in self.tiles.sprites():
@@ -380,22 +420,38 @@ class Level:
                 elif self.travaler.direction[1] < 0:
                     self.travaler.rect.top = sprite.rect.bottom
                     self.travaler.direction[1] = 0
-                    self.travaler.on_ceiling = True
+                self.travaler.on_ceiling = True
 
         if self.travaler.on_ground and self.travaler.direction[1] < 0 or self.travaler.direction[1] > 1:
             self.travaler.on_ground = False
         if self.travaler.on_ceiling and self.travaler.direction[1] > 0.1:
             self.travaler.on_ceiling = False
 
+    def enemy_collision_reverse(self):
+        for enemy in self.enemies.sprites():
+            if not pygame.sprite.spritecollide(enemy, self.tiles, False):
+                enemy.reverse()
+
     def run(self):
         # частицы
         self.dust_sprite.update(self.world_shift)
+
         self.dust_sprite.draw(self.screen)
 
         # плитки
-        self.tiles.update(self.world_shift)
-        self.tiles.draw(self.screen)
+     #   self.tiles.draw(self.screen)
+
+        self.decorations.draw(self.screen)
         self.scroll_x()
+        self.tiles.draw(self.screen)
+       # self.scroll_x()
+
+        # мобы
+        self.enemies.update(self.world_shift)
+        self.tiles.update(self.world_shift)
+        self.decorations.update(self.world_shift)
+        self.enemy_collision_reverse()
+        self.enemies.draw(self.screen)
 
         # игрок
         self.player_group.update()
@@ -404,7 +460,6 @@ class Level:
         self.vertical_movement_collision()
         self.create_landing_dust()
         self.player_group.draw(self.screen)
-
 
 
 def settings():
@@ -545,16 +600,18 @@ def about_widget():
 def game():
     running = True
 
-    level = Level(level_map, screen)
+    level = Level("maps/level.tmx", screen)
 
     while running:
+        screen.fill('black')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        screen.fill('black')
+
         level.run()
+
 
         pygame.display.update()
         clock.tick(60)
@@ -571,4 +628,4 @@ def terminate():
 
 
 if __name__ == '__main__':
-    start_menu()
+    game()
