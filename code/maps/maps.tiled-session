@@ -5,8 +5,8 @@
     },
     "activeFile": "level.tmx",
     "expandedProjectPaths": [
-        ".",
-        "D:/ЯНДЕКС ЛИЦЕЙ/tet"
+        "D:/ЯНДЕКС ЛИЦЕЙ/tet",
+        "."
     ],
     "fileStates": {
         "": {
@@ -157,11 +157,11 @@
             "scaleInDock": 1
         },
         "level.tmx": {
-            "scale": 0.75,
-            "selectedLayer": 5,
+            "scale": 1.5,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 313.3333333333333,
-                "y": 226.66666666666669
+                "x": 1397.3333333333333,
+                "y": 112
             }
         },
         "level.tmx#Tileset32": {
@@ -203,6 +203,7 @@
             }
         },
         "photo_2022-01-07_19-49-32.tsx": {
+            "scaleInDock": 1,
             "scaleInEditor": 5.5
         },
         "sea.tsx": {
@@ -251,11 +252,11 @@
     ],
     "project": "maps.tiled-project",
     "recentFiles": [
-        "photo_2022-01-07_19-49-32.tsx",
         "Tileset32.tsx",
         "Middleground.tsx",
         "Props.tsx",
         "level.tmx",
+        "photo_2022-01-07_19-49-32.tsx",
         "Tileset.tsx",
         "level_test.tmx",
         "level0.tmx",

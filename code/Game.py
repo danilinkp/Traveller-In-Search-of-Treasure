@@ -5,10 +5,9 @@ import sys
 import pytmx
 
 from Mobs import Mob
-from settings import *
 
 from tiles import Tile
-from settings import tile_size, screen_width
+from settings import screen_width
 from player import Traveler
 from particles import ParticleEffect
 
@@ -17,7 +16,7 @@ pygame.display.set_caption('pygame-project')
 
 SIZE = WIDTH, HEIGHT = 1280, 764
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-# screen = pygame.display.set_mode((1280, 720), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
 left = False
 right = False
 volume = 60
@@ -51,7 +50,7 @@ LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
-def rotate(elems):
+def rotate():
     pass
 
 
@@ -100,7 +99,7 @@ class SystemButton:
                         y + ((self.height - text.get_height()) // 2)))
 
 
-def show_menu(screen, clock):
+def show_menu():
     """ Отрисовка самого меню """
     menu_background = load_image('background.jpg')
     show_menu_f = True
@@ -127,13 +126,13 @@ def show_menu(screen, clock):
 
 def start_menu():
     running = True
-    clock = pygame.time.Clock()
-    show_menu(screen, clock)
+
+    show_menu()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        tick = clock.tick()
+
         pygame.display.flip()
     pygame.quit()
 
@@ -255,7 +254,7 @@ class FunctionCallDrawing:
 
         for i in self.w_h:
             self.buttons.append(Button(i[0], i[1]))
-            print(i)
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -281,25 +280,39 @@ class Level:
         # level setup
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
 
-        self.decorations = pygame.sprite.Group()
-        self.tiles = pygame.sprite.Group()  # группа плиток
+        self.tiles = pygame.sprite.Group()
+        self.boxes_and_cubes = pygame.sprite.Group()
+        self.checkpoint = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()  # группа с героем
         self.enemies = pygame.sprite.Group()
+        self.decorations = pygame.sprite.Group()
+        self.constraints = pygame.sprite.Group()
+        self.background_im = pygame.sprite.Group()
+        self.water = pygame.sprite.Group()
         self.screen = surface  # скрин
-         # добавление карты
-        self.world_shift = 0  # скорость передвижения камеры
-        self.current_x = 150
+        # добавление карты
+        self.world_shift = 10  # скорость передвижения камеры
+        self.current_x = 160
+
+
 
         self.dust_sprite = pygame.sprite.GroupSingle()  # группа с частицами
         self.player_on_ground = False
         self.path = path
         self.map = pytmx.load_pygame("maps/level.tmx")
         self.num_of_layers = len(self.map.layers)
-        print(self.num_of_layers)
         self.height_map = self.map.height
         self.width_map = self.map.width
         self.tile_size = self.map.tilewidth * 2
+        self.count_camera = 90
+        self.running_now = True
         self.render()
+
+        self.run()
+        self.running_now = False
+
+
+
 
     def create_jump_particles(self, pos):
         if self.travaler.direction_to_the_right:
@@ -330,14 +343,16 @@ class Level:
                     (self.travaler.rect.midbottom[0] + 10, self.travaler.rect.midbottom[1] - 15), 'land')
             self.dust_sprite.add(fall_dust_particle)
 
-
     def render(self):
-        print(self.height_map, self.width_map)
-        self.travaler = Traveler((720, 200), self.screen, self.create_jump_particles)
+
+        self.travaler = Traveler((7 * 32, 14 * 32), self.screen, self.create_jump_particles)
         self.player_group.add(self.travaler)
-        pos = 256, 448
-        enemy = Mob(pos, self.tile_size)
-        self.enemies.add(enemy)
+
+        spisok = [(58 * 32, 16 * 32), (48 * 32, 6 * 32)]
+        spisok_constrains = [(55 * 32, 6 * 32), (46 * 32, 6 * 32), (54 * 32, 16 * 32), (61 * 32, 16 * 32)]
+        for pos in spisok:
+            enemy = Mob(pos, self.tile_size)
+            self.enemies.add(enemy)
         for y in range(self.height_map):
             for x in range(self.width_map):
                 for i in range(self.num_of_layers):
@@ -345,52 +360,88 @@ class Level:
                     #          print(image)
                     x_1 = x * self.tile_size
                     y_1 = y * self.tile_size
-                 #   print(x_1, y_1)
+                    #   print(x_1, y_1)
 
                     if image:
+                        #  < TiledTileLayer[2]: "background_mountains" > 1
+                        #  < TiledTileLayer[4]: "decoration" >,2
+                        #  < TiledTileLayer[8]: "checkpoint" >,3
+                        #  < TiledTileLayer[3]: "background_trees" >,4
+                        #  < TiledTileLayer[5]: "water" >,5
+                        #  < TiledTileLayer[7]: "grass" >,6
+                        #  < TiledTileLayer[6]: "boxes" >,7
+                        #  < TiledTileLayer[1]: "landscape" >8
+                        #  < TiledTileLayer[9]: "cubes" >]9
+                        image = pygame.transform.scale(image,
+                                                       (
+                                                           image.get_width() * 2,
+                                                           image.get_height() * 2))
 
+                        if (x_1, y_1) in spisok_constrains:
+                            tile = Tile((x_1, y_1), self.tile_size, image)
+                            self.constraints.add(tile)
+                        else:
 
-
-                            if i == 5 or i == 4:
-                                image = pygame.transform.scale(image,
-                                                               (
-                                                                   image.get_width() * 2,
-                                                                   image.get_height() * 2))
+                            if i == 8 or i == 7 or i == 6:
                                 tile = Tile((x_1, y_1), self.tile_size, image)
                                 self.tiles.add(tile)
+                            if i == 7 or i == 6:
+
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+                                self.boxes_and_cubes.add(tile)
+                            elif i == 0:
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+                                self.background_im.add(tile)
+
+                            elif i == 4:
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+
+                                self.water.add(tile)
+
+                            elif i == 2:
+                                tile = Tile((x_1, y_1), self.tile_size, image)
+
+                                self.checkpoint.add(tile)
+
                             else:
-                                image = pygame.transform.scale(image,
-                                                               (
-                                                                   image.get_width() * 2,
-                                                                   image.get_height() * 2))
+
                                 tile = Tile((x_1, y_1), self.tile_size, image)
                                 self.decorations.add(tile)
-
-                    # if image:
-                    #    image = pygame.transform.scale(image,
-                    #                          (image.get_width() * 2, image.get_height() * 2))
-                    #  screen.blit(image, (x * self.tile_size, y * self.tile_size))
 
     def scroll_x(self):
         player_x = self.travaler.rect.centerx
         direction_x = self.travaler.direction
 
-        if player_x < screen_width / 2 and direction_x[0] < 0:
-            self.world_shift = 8
+        print(self.travaler.rect.x)
+        print(87 * 32)
+
+
+
+        if self.running_now:
+            self.world_shift = -385 * 2
             self.travaler.speed = 0
-        elif player_x > screen_width - (screen_width / 2) and direction_x[0] > 0:
-            self.world_shift = -8
-            self.travaler.speed = 0
+
+        elif player_x < screen_width / 4 and direction_x[0] < 0:
+
+                self.world_shift = 6
+                self.travaler.speed = 0
+        elif player_x > screen_width - (screen_width / 4) and direction_x[0] > 0:
+
+                self.world_shift = -6
+                self.travaler.speed = 0
         else:
+            self.running_now = False
             self.world_shift = 0
-            self.travaler.speed = 8
+            self.travaler.speed = 6
 
     def horizontal_movement_collision(self):
         self.travaler.rect.x += self.travaler.direction[0] * self.travaler.speed
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(self.travaler.rect):
+
                 if self.travaler.direction[0] < 0:
+
                     self.travaler.rect.left = sprite.rect.right
                     self.travaler.on_left = True
                     self.current_x = self.travaler.rect.left
@@ -413,6 +464,7 @@ class Level:
 
         for sprite in self.tiles.sprites():
             if sprite.rect.colliderect(self.travaler.rect):
+
                 if self.travaler.direction[1] > 0:
                     self.travaler.rect.bottom = sprite.rect.top
                     self.travaler.direction[1] = 0
@@ -429,37 +481,61 @@ class Level:
 
     def enemy_collision_reverse(self):
         for enemy in self.enemies.sprites():
-            if not pygame.sprite.spritecollide(enemy, self.tiles, False):
+            if pygame.sprite.spritecollide(enemy, self.constraints, False):
                 enemy.reverse()
 
+    def check_enemy_collisions(self):
+        enemy_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.enemies, False)
+
+        if enemy_collisions:
+            for enemy in enemy_collisions:
+                enemy_center = enemy.rect.centery
+                enemy_top = enemy.rect.top
+                player_bottom = self.player_group.sprite.rect.bottom
+                if enemy_top < player_bottom < enemy_center and self.player_group.sprite.direction[1] >= 0:
+                    self.player_group.sprite.direction[1] = -15
+                    #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
+
+                    enemy.kill()
+
     def run(self):
-        # частицы
-        self.dust_sprite.update(self.world_shift)
+        self.background_im.update(self.world_shift)
 
-        self.dust_sprite.draw(self.screen)
-
-        # плитки
-     #   self.tiles.draw(self.screen)
+        self.background_im.draw(self.screen)
+        self.decorations.update(self.world_shift)
 
         self.decorations.draw(self.screen)
-        self.scroll_x()
-        self.tiles.draw(self.screen)
-       # self.scroll_x()
 
-        # мобы
-        self.enemies.update(self.world_shift)
         self.tiles.update(self.world_shift)
-        self.decorations.update(self.world_shift)
+
+        self.tiles.draw(self.screen)
+
+        self.enemies.update(self.world_shift)
+
+        self.constraints.update(self.world_shift)
+
+        self.constraints.draw(self.screen)
         self.enemy_collision_reverse()
         self.enemies.draw(self.screen)
 
-        # игрок
+        self.dust_sprite.update(self.world_shift)
+        self.dust_sprite.draw(self.screen)
+
+        self.checkpoint.update(self.world_shift)
+        self.checkpoint.draw(self.screen)
+
         self.player_group.update()
         self.horizontal_movement_collision()
         self.get_player_on_ground()
         self.vertical_movement_collision()
         self.create_landing_dust()
+
+        self.water.update(self.world_shift)
+        self.water.draw(self.screen)
+        self.scroll_x()
         self.player_group.draw(self.screen)
+
+        self.check_enemy_collisions()
 
 
 def settings():
@@ -604,14 +680,14 @@ def game():
 
     while running:
         screen.fill('black')
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-
         level.run()
-
+        pygame.display.flip()
 
         pygame.display.update()
         clock.tick(60)
@@ -619,7 +695,7 @@ def game():
 
 def get_event(sprite, event):
     if sprite.rect.collidepoint(event.pos):
-        print(10)
+        pass
 
 
 def terminate():

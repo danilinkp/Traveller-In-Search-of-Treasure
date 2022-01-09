@@ -28,7 +28,8 @@ class Mob(AnimatedTile):
         self.loading_hero_sprites()
         super().__init__(pos, size, self.animations)
         self.rect.y += size - self.image.get_size()[1]
-        self.speed = 5
+        self.speed = 3
+        self.check_flag = 1
 
     def loading_hero_sprites(self):  # импорт спрайтов для игрока
         animations_test = [load_image('../graphics/enemies/Walk/Walk_1.png'),
@@ -47,8 +48,18 @@ class Mob(AnimatedTile):
         if self.speed > 0:
             self.image = pygame.transform.flip(self.image, True, False)
 
+    def return_size_image(self):
+        return self.image.get_width()
+
+
+
+
+
     def reverse(self):
         self.speed *= -1
+
+    def return_speed(self):
+        return self.speed
 
     def update(self, x_shift):
         self.rect.x += x_shift

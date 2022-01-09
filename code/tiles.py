@@ -6,6 +6,7 @@ class Tile(pygame.sprite.Sprite):
         super().__init__()
        # print(size)
         self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
         #print(image)
         #self.image = pygame.Surface((size, size))
 

@@ -32,6 +32,8 @@ class Traveler(pygame.sprite.Sprite):
         self.frame_index = 0
         self.count = 0
         self.image = self.animations_dict['idle'][self.frame_index]
+
+        self.mask = pygame.mask.from_surface(self.image)
         # для определения заданного начального положения координат верхнего левого угла
         self.rect = self.image.get_rect(topleft=pos)
 
@@ -45,7 +47,7 @@ class Traveler(pygame.sprite.Sprite):
 
         # движения игркоа
         self.direction = [0, 0]  # позиция игрока
-        self.speed = 8  # скорость передвижения
+        self.speed = 6  # скорость передвижения
         self.gravity = 0.8  # скорость подъема
         self.jump_speed = -16
 
@@ -164,6 +166,7 @@ class Traveler(pygame.sprite.Sprite):
         self.direction[1] = self.jump_speed
 
     def update(self):
+
         self.get_input()
         self.get_status()
         self.animate()
