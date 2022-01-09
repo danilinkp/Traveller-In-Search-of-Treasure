@@ -37,14 +37,14 @@ def load_image(name, dictor='images', colorkey=None):
     image = pygame.image.load(fullname)
     if colorkey is not None:
         image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
+    if colorkey == -1:
+        colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
     else:
         image = image.convert_alpha()
     return image
 
-
+# test
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
