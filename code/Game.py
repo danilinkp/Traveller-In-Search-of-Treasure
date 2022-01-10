@@ -227,7 +227,7 @@ def buy_warrior():
                                [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
                                 [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
                                 [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
-                                ])
+                            ])
     name.run()  # потом нужно будет исправить
 
 
@@ -305,6 +305,7 @@ class Level:
         self.width_map = self.map.width
         self.tile_size = self.map.tilewidth * 2
         self.count_camera = 90
+        self.change = 20
         self.running_now = True
         self.render()
 
@@ -345,7 +346,7 @@ class Level:
 
     def render(self):
 
-        self.travaler = Traveler((7 * 32, 14 * 32), self.screen, self.create_jump_particles)
+        self.travaler = Traveler((7 * 32, 14 * 32), self.screen, self.create_jump_particles, self.change)
         self.player_group.add(self.travaler)
 
         spisok = [(58 * 32, 16 * 32), (48 * 32, 6 * 32)]
@@ -353,6 +354,7 @@ class Level:
         for pos in spisok:
             enemy = Mob(pos, self.tile_size)
             self.enemies.add(enemy)
+
         for y in range(self.height_map):
             for x in range(self.width_map):
                 for i in range(self.num_of_layers):
@@ -365,7 +367,7 @@ class Level:
                     if image:
                         #  < TiledTileLayer[2]: "background_mountains" > 1
                         #  < TiledTileLayer[4]: "decoration" >,2
-                        #  < TiledTileLayer[8]: "checkpoint" >,3
+                    #  < TiledTileLayer[8]: "checkpoint" >,3
                         #  < TiledTileLayer[3]: "background_trees" >,4
                         #  < TiledTileLayer[5]: "water" >,5
                         #  < TiledTileLayer[7]: "grass" >,6
@@ -412,8 +414,7 @@ class Level:
         player_x = self.travaler.rect.centerx
         direction_x = self.travaler.direction
 
-        print(self.travaler.rect.x)
-        print(87 * 32)
+
 
 
 
@@ -484,6 +485,11 @@ class Level:
             if pygame.sprite.spritecollide(enemy, self.constraints, False):
                 enemy.reverse()
 
+    def water_collision(self):
+
+        if pygame.sprite.spritecollide(self.travaler, self.water, False):
+                print('DEATH')
+
     def check_enemy_collisions(self):
         enemy_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.enemies, False)
 
@@ -497,6 +503,8 @@ class Level:
                     #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
 
                     enemy.kill()
+                else:
+                    self.travaler.get_damage()
 
     def run(self):
         self.background_im.update(self.world_shift)
@@ -536,6 +544,7 @@ class Level:
         self.player_group.draw(self.screen)
 
         self.check_enemy_collisions()
+        self.water_collision()
 
 
 def settings():

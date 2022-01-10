@@ -1,5 +1,6 @@
 import os
 import sys
+from math import sin
 
 import pygame
 
@@ -22,7 +23,7 @@ def load_image(name, dictor='', colorkey=None):
 
 
 class Traveler(pygame.sprite.Sprite):
-    def __init__(self, pos, screen, jump_particles):
+    def __init__(self, pos, screen, jump_particles, change_health):
         super().__init__()
         self.animations_dict = {'idle': [],
                                 'run': []}
@@ -58,6 +59,13 @@ class Traveler(pygame.sprite.Sprite):
         self.on_ceiling = False
         self.on_left = False
         self.on_right = False
+
+        # health management
+        self.change_health = change_health
+        self.invincible = False
+        self.invincibility_duration = 500
+        self.hurt_time = 0
+        self.player_hp = 100
 
     def loading_hero_sprites(self):  # импорт спрайтов для игрока
         animations_test = {'idle': [load_image('../graphics/character/idle/1.png'),
@@ -166,11 +174,11 @@ class Traveler(pygame.sprite.Sprite):
         self.direction[1] = self.jump_speed
 
     def update(self):
-
         self.get_input()
         self.get_status()
         self.animate()
         self.run_dust_animation()
+        self.invincibility_timer()
 
     def set_the_rect(self):
         if self.on_ground and self.on_right:
@@ -186,3 +194,19 @@ class Traveler(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(topleft=self.rect.topleft)
         elif self.on_ceiling:
             self.rect = self.image.get_rect(midtop=self.rect.midtop)
+
+    def get_damage(self):
+        if not self.invincible:
+          #  self.change_health(-10)
+            self.player_hp -= 10
+            self.invincible = True
+            self.hurt_time = pygame.time.get_ticks()
+        print(self.player_hp)
+
+    def invincibility_timer(self):
+        if self.invincible:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.hurt_time >= self.invincibility_duration:
+                self.invincible = False
+
+
