@@ -10,7 +10,6 @@ from tiles import Tile
 
 from player import Traveler
 
-
 from particles import ParticleEffect, HitEffect
 
 pygame.init()
@@ -340,16 +339,16 @@ class Level:
 
     def create_hit_particles(self):
 
-            if self.travaler.direction_to_the_right:
+        if self.travaler.direction_to_the_right:
 
-                fall_dust_particle = HitEffect((self.travaler.rect.midbottom[0],
-                                                     self.travaler.rect.midbottom[1] - 15), 'hit')
+            fall_dust_particle = HitEffect((self.travaler.rect.midbottom[0],
+                                            self.travaler.rect.midbottom[1] - 15), 'hit')
 
-            else:
+        else:
 
-                fall_dust_particle = HitEffect(
-                    (self.travaler.rect.midbottom[0], self.travaler.rect.midbottom[1] - 15), 'hit')
-            self.dust_sprite.add(fall_dust_particle)
+            fall_dust_particle = HitEffect(
+                (self.travaler.rect.midbottom[0], self.travaler.rect.midbottom[1] - 15), 'hit')
+        self.dust_sprite.add(fall_dust_particle)
 
     def get_player_on_ground(self):
         if self.travaler.on_ground:
@@ -385,9 +384,9 @@ class Level:
         spisok_coins_silver = [(41 * 32, 4 * 32)]
         spisok_coins_diamond = [(42 * 32, 4 * 32)]
         spisok_health = [(43 * 32, 4 * 32)]
-        for i in range(20):
-            water = Water((i * 32 + 270 * i, 800), self.tile_size)
-            self.water_2.add(water)
+        for i in range(30):
+            water = Water((i * 32 + 275 * i, 800), self.tile_size)
+            self.water.add(water)
         for pos in spisok:
             enemy = Mob(pos, self.tile_size, 40, 2)
             self.enemies.add(enemy)
@@ -444,17 +443,14 @@ class Level:
                                 tile = Tile((x_1, y_1), self.tile_size, image)
                                 self.background_im.add(tile)
 
-                            elif 'water' in str(self.layers[i]):
-                                tile = Tile((x_1, y_1), self.tile_size, image)
-
-                                self.water.add(tile)
 
                             elif 'checkpoint' in str(self.layers[i]):
                                 tile = Tile((x_1, y_1), self.tile_size, image)
 
                                 self.checkpoint.add(tile)
 
-
+                            elif 'water' in str(self.layers[i]):
+                                pass
 
 
                             else:
@@ -588,7 +584,6 @@ class Level:
                     if self.travaler.player_hp > 300:
                         self.travaler.player_hp = 300
 
-
                 coin.kill()
 
     def check_death(self):
@@ -664,8 +659,6 @@ class Level:
         self.rect_y_coins()
         self.gold_coins.draw(self.screen)
 
-
-
         self.checkpoint.update(self.world_shift)
         self.checkpoint.draw(self.screen)
 
@@ -675,9 +668,8 @@ class Level:
         self.vertical_movement_collision()
         self.create_landing_dust()
 
-
-        self.water_2.update(self.world_shift)
-        self.water_2.draw(self.screen)
+        self.water.update(self.world_shift)
+        self.water.draw(self.screen)
 
         self.scroll_x()
 
@@ -868,3 +860,4 @@ def terminate():
 
 if __name__ == '__main__':
     game()
+

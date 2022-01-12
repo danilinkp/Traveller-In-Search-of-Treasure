@@ -225,6 +225,7 @@ class Water(AnimatedTile):
     def __init__(self, pos, size):
         self.animations = []
 
+
         self.loading_hero_sprites()
 
         super().__init__(pos, size, self.animations)
@@ -236,8 +237,6 @@ class Water(AnimatedTile):
                            load_image('../graphics/water/2.png'),
                            load_image('../graphics/water/3.png'),
                            load_image('../graphics/water/4.png')]
-
-
 
         for i in animations_test:
             i = pygame.transform.scale(i,
