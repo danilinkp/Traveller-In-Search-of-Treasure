@@ -4,12 +4,14 @@ import sys
 
 import pytmx
 
-from Mobs import Mob
+from Mobs import Mob, Coin, Hp, Diamond, Water
 
 from tiles import Tile
-from settings import screen_width
+
 from player import Traveler
-from particles import ParticleEffect
+
+
+from particles import ParticleEffect, HitEffect
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
@@ -23,6 +25,8 @@ volume = 60
 change_difficult = 0
 select_lang = 0
 animCount = 8
+score = 0
+count_diamond = 0
 all_sprites = pygame.sprite.Group()
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 pos_of_player = [256, 448]
@@ -43,6 +47,7 @@ def load_image(name, dictor='images', colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
 
 # test
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
@@ -227,7 +232,7 @@ def buy_warrior():
                                [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
                                 [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
                                 [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
-                            ])
+                                ])
     name.run()  # потом нужно будет исправить
 
 
@@ -289,31 +294,41 @@ class Level:
         self.constraints = pygame.sprite.Group()
         self.background_im = pygame.sprite.Group()
         self.water = pygame.sprite.Group()
+        self.water_2 = pygame.sprite.Group()
+        self.hit_animated = False
+
+        self.gold_coins = pygame.sprite.Group()
+        self.health_player_images = pygame.sprite.Group()
+        self.diamond_coins = pygame.sprite.Group()
+
         self.screen = surface  # скрин
+
+        self.hp_class = Hp()
+
         # добавление карты
         self.world_shift = 10  # скорость передвижения камеры
         self.current_x = 160
 
-
-
         self.dust_sprite = pygame.sprite.GroupSingle()  # группа с частицами
         self.player_on_ground = False
         self.path = path
-        self.map = pytmx.load_pygame("maps/level.tmx")
-        self.num_of_layers = len(self.map.layers)
+        self.map = pytmx.load_pygame(self.path)
+        self.layers = self.map.layers
+        self.num_of_layers = len(self.layers)
+        self.count_hit_anim = 0
+
         self.height_map = self.map.height
         self.width_map = self.map.width
         self.tile_size = self.map.tilewidth * 2
         self.count_camera = 90
+        self.coins_flag = False
         self.change = 20
         self.running_now = True
+        self.death = False
         self.render()
 
         self.run()
         self.running_now = False
-
-
-
 
     def create_jump_particles(self, pos):
         if self.travaler.direction_to_the_right:
@@ -322,6 +337,19 @@ class Level:
         else:
             jump_particle_sprite = ParticleEffect((pos[0] + 10, pos[1] - 5), 'jump')
             self.dust_sprite.add(jump_particle_sprite)
+
+    def create_hit_particles(self):
+
+            if self.travaler.direction_to_the_right:
+
+                fall_dust_particle = HitEffect((self.travaler.rect.midbottom[0],
+                                                     self.travaler.rect.midbottom[1] - 15), 'hit')
+
+            else:
+
+                fall_dust_particle = HitEffect(
+                    (self.travaler.rect.midbottom[0], self.travaler.rect.midbottom[1] - 15), 'hit')
+            self.dust_sprite.add(fall_dust_particle)
 
     def get_player_on_ground(self):
         if self.travaler.on_ground:
@@ -335,39 +363,62 @@ class Level:
 
             if self.travaler.direction_to_the_right:
 
-                fall_dust_particle = ParticleEffect((self.travaler.rect.midbottom[0] - 10,
+                fall_dust_particle = ParticleEffect((self.travaler.rect.midbottom[0],
                                                      self.travaler.rect.midbottom[1] - 15), 'land')
 
             else:
 
                 fall_dust_particle = ParticleEffect(
-                    (self.travaler.rect.midbottom[0] + 10, self.travaler.rect.midbottom[1] - 15), 'land')
+                    (self.travaler.rect.midbottom[0], self.travaler.rect.midbottom[1] - 15), 'land')
             self.dust_sprite.add(fall_dust_particle)
 
     def render(self):
 
-        self.travaler = Traveler((7 * 32, 14 * 32), self.screen, self.create_jump_particles, self.change)
+        self.travaler = Traveler((34 * 32, 12 * 32), self.screen, self.create_jump_particles, self.change)
         self.player_group.add(self.travaler)
+        self.diamond_im = Diamond((10, 60), self.tile_size)
+        self.diamond_coins.add(self.diamond_im)
 
         spisok = [(58 * 32, 16 * 32), (48 * 32, 6 * 32)]
         spisok_constrains = [(55 * 32, 6 * 32), (46 * 32, 6 * 32), (54 * 32, 16 * 32), (61 * 32, 16 * 32)]
+        spisok_coins_gold = [(40 * 32, 4 * 32)]
+        spisok_coins_silver = [(41 * 32, 4 * 32)]
+        spisok_coins_diamond = [(42 * 32, 4 * 32)]
+        spisok_health = [(43 * 32, 4 * 32)]
+        for i in range(20):
+            water = Water((i * 32 + 270 * i, 800), self.tile_size)
+            self.water_2.add(water)
         for pos in spisok:
-            enemy = Mob(pos, self.tile_size)
+            enemy = Mob(pos, self.tile_size, 40, 2)
             self.enemies.add(enemy)
+        for pos in spisok_coins_gold:
+            enemy = Coin(pos, self.tile_size, 1)
+            self.gold_coins.add(enemy)
+
+        for pos in spisok_coins_silver:
+            enemy = Coin(pos, self.tile_size, 5)
+            self.gold_coins.add(enemy)
+
+        for pos in spisok_coins_diamond:
+            enemy = Coin(pos, self.tile_size, 2)
+            self.gold_coins.add(enemy)
+
+        for pos in spisok_health:
+            enemy = Coin(pos, self.tile_size, 3)
+            self.gold_coins.add(enemy)
 
         for y in range(self.height_map):
             for x in range(self.width_map):
                 for i in range(self.num_of_layers):
                     image = self.map.get_tile_image(x, y, i)
-                    #          print(image)
+
                     x_1 = x * self.tile_size
                     y_1 = y * self.tile_size
-                    #   print(x_1, y_1)
 
                     if image:
                         #  < TiledTileLayer[2]: "background_mountains" > 1
                         #  < TiledTileLayer[4]: "decoration" >,2
-                    #  < TiledTileLayer[8]: "checkpoint" >,3
+                        #  < TiledTileLayer[8]: "checkpoint" >,3
                         #  < TiledTileLayer[3]: "background_trees" >,4
                         #  < TiledTileLayer[5]: "water" >,5
                         #  < TiledTileLayer[7]: "grass" >,6
@@ -383,27 +434,28 @@ class Level:
                             tile = Tile((x_1, y_1), self.tile_size, image)
                             self.constraints.add(tile)
                         else:
-
-                            if i == 8 or i == 7 or i == 6:
+                            # print(type(self.layers[i]))
+                            if 'landscape' in str(self.layers[i]) or 'cubes' in str(self.layers[i]) or 'boxes' in str(
+                                    self.layers[i]):
                                 tile = Tile((x_1, y_1), self.tile_size, image)
                                 self.tiles.add(tile)
-                            if i == 7 or i == 6:
 
-                                tile = Tile((x_1, y_1), self.tile_size, image)
-                                self.boxes_and_cubes.add(tile)
-                            elif i == 0:
+                            if 'ground' in str(self.layers[i]):
                                 tile = Tile((x_1, y_1), self.tile_size, image)
                                 self.background_im.add(tile)
 
-                            elif i == 4:
+                            elif 'water' in str(self.layers[i]):
                                 tile = Tile((x_1, y_1), self.tile_size, image)
 
                                 self.water.add(tile)
 
-                            elif i == 2:
+                            elif 'checkpoint' in str(self.layers[i]):
                                 tile = Tile((x_1, y_1), self.tile_size, image)
 
                                 self.checkpoint.add(tile)
+
+
+
 
                             else:
 
@@ -414,22 +466,18 @@ class Level:
         player_x = self.travaler.rect.centerx
         direction_x = self.travaler.direction
 
-
-
-
-
         if self.running_now:
             self.world_shift = -385 * 2
             self.travaler.speed = 0
 
-        elif player_x < screen_width / 4 and direction_x[0] < 0:
+        elif player_x < WIDTH / 4 and direction_x[0] < 0:
 
-                self.world_shift = 6
-                self.travaler.speed = 0
-        elif player_x > screen_width - (screen_width / 4) and direction_x[0] > 0:
+            self.world_shift = 6
+            self.travaler.speed = 0
+        elif player_x > WIDTH - (WIDTH / 4) and direction_x[0] > 0:
 
-                self.world_shift = -6
-                self.travaler.speed = 0
+            self.world_shift = -6
+            self.travaler.speed = 0
         else:
             self.running_now = False
             self.world_shift = 0
@@ -488,9 +536,11 @@ class Level:
     def water_collision(self):
 
         if pygame.sprite.spritecollide(self.travaler, self.water, False):
-                print('DEATH')
+            self.travaler.player_hp = 0
 
     def check_enemy_collisions(self):
+        global score
+
         enemy_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.enemies, False)
 
         if enemy_collisions:
@@ -501,10 +551,93 @@ class Level:
                 if enemy_top < player_bottom < enemy_center and self.player_group.sprite.direction[1] >= 0:
                     self.player_group.sprite.direction[1] = -15
                     #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
+                    score += 20
 
                     enemy.kill()
                 else:
-                    self.travaler.get_damage()
+
+                    self.travaler.get_damage(enemy.return_hit())
+                    if not self.hit_animated:
+                        self.hit_animated = True
+                        self.create_hit_particles()
+                    else:
+                        if self.count_hit_anim == 10:
+                            self.hit_animated = False
+                            self.count_hit_anim = 0
+                        else:
+                            self.count_hit_anim += 1
+
+    def check_coins_collisions(self):
+        global score
+        global count_diamond
+
+        coin_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.gold_coins, False)
+
+        if coin_collisions:
+            for coin in coin_collisions:
+
+                name, count = coin.collisions()
+                if name == 's':
+                    score += count
+                elif name == 's_d':
+                    count_diamond += 1
+                    score += count
+                elif name == 'h':
+
+                    self.travaler.player_hp += count + 50
+                    if self.travaler.player_hp > 300:
+                        self.travaler.player_hp = 300
+
+
+                coin.kill()
+
+    def check_death(self):
+        return True if self.death else False
+
+    def rect_y_coins(self):
+        if not self.coins_flag:
+            for sprite in self.gold_coins.sprites():
+                sprite.rect.y += 19
+            self.coins_flag = True
+
+    def check_player_hp(self):
+        if self.travaler.player_hp <= 0:
+            self.death = True
+
+    def diamond(self):
+
+        pos = 10, 50
+
+        enemy = Diamond(pos, self.tile_size)
+
+        enemy.update()
+
+    def health(self):
+
+        count = self.travaler.return_hp()
+        images = self.hp_class.return_image(count)
+
+        pos = 40, 10
+        for i in range(len(images)):
+            screen.blit(images[i], (pos[0] * i + 10, pos[1]))
+
+    def draw_score(self):
+        global score
+
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 20)
+        text = font.render(f"SCORE: {score}", True, (0, 0, 0))
+        text_x = 1080
+        text_y = 20
+        self.screen.blit(text, (text_x, text_y))
+
+    def draw_count_diamond(self):
+        global count_diamond
+
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 25)
+        text = font.render(f"{count_diamond}", True, (0, 0, 0))
+        text_x = 50
+        text_y = 70
+        self.screen.blit(text, (text_x, text_y))
 
     def run(self):
         self.background_im.update(self.world_shift)
@@ -521,13 +654,17 @@ class Level:
         self.enemies.update(self.world_shift)
 
         self.constraints.update(self.world_shift)
+        self.gold_coins.update(self.world_shift)
 
         self.constraints.draw(self.screen)
-        self.enemy_collision_reverse()
-        self.enemies.draw(self.screen)
 
-        self.dust_sprite.update(self.world_shift)
-        self.dust_sprite.draw(self.screen)
+        self.enemy_collision_reverse()
+
+        self.enemies.draw(self.screen)
+        self.rect_y_coins()
+        self.gold_coins.draw(self.screen)
+
+
 
         self.checkpoint.update(self.world_shift)
         self.checkpoint.draw(self.screen)
@@ -538,13 +675,27 @@ class Level:
         self.vertical_movement_collision()
         self.create_landing_dust()
 
-        self.water.update(self.world_shift)
-        self.water.draw(self.screen)
+
+        self.water_2.update(self.world_shift)
+        self.water_2.draw(self.screen)
+
         self.scroll_x()
+
         self.player_group.draw(self.screen)
+        self.dust_sprite.update(self.world_shift)
+        self.dust_sprite.draw(self.screen)
+
+        self.draw_score()
+        self.health()
+
+        self.diamond_coins.update()
+        self.diamond_coins.draw(self.screen)
+        self.draw_count_diamond()
 
         self.check_enemy_collisions()
+        self.check_coins_collisions()
         self.water_collision()
+        self.check_player_hp()
 
 
 def settings():
@@ -696,6 +847,9 @@ def game():
                 sys.exit()
 
         level.run()
+
+        if level.check_death():
+            running = False
         pygame.display.flip()
 
         pygame.display.update()

@@ -4,19 +4,16 @@ import pygame
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, size, image):
         super().__init__()
-       # print(size)
+        # print(size)
         self.image = image
         self.mask = pygame.mask.from_surface(self.image)
-        #print(image)
-        #self.image = pygame.Surface((size, size))
-
+        # print(image)
+        # self.image = pygame.Surface((size, size))
 
         self.rect = self.image.get_rect(topleft=pos)
 
     def update(self, x_shift):
         self.rect.x += x_shift
-
-
 
 
 class AnimatedTile(Tile):
@@ -34,7 +31,6 @@ class AnimatedTile(Tile):
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
         self.image = self.frames[int(self.frame_index)]
-
 
     def update(self, x_shift):
         self.animate()
