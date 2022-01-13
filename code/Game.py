@@ -11,6 +11,7 @@ from tiles import Tile
 from player import Traveler
 
 from particles import ParticleEffect, HitEffect
+from level_select import TravelGuide
 
 pygame.init()
 pygame.display.set_caption('pygame-project')
@@ -29,6 +30,8 @@ count_diamond = 0
 all_sprites = pygame.sprite.Group()
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 pos_of_player = [256, 448]
+overworld = TravelGuide()
+clock = pygame.time.Clock()
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -54,10 +57,6 @@ LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 
 
-def rotate():
-    pass
-
-
 class Button:
     """ Класс кнопок для создания непосредственно самих конпок """
 
@@ -65,24 +64,29 @@ class Button:
         self.width = width
         self.height = height
 
-    def draw(self, x, y, message, button_image, action=None, font_size=50):
+    def draw(self, x, y, message, button_image, action=None, font_size=30, type_id=None):
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()
         if (x < mouse_pos_x < x + self.width) and (y < mouse_pos_y < y + self.height):
             screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)),
                         (x, y - 5))
-            font = pygame.font.Font(None, font_size)
+            font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
             text = font.render(message, True, 'white')
             screen.blit(text, (
                 x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
             if clicked[0]:
                 pygame.mixer.Sound.play(MENU_BTN_SOUND)
                 pygame.time.delay(300)
-                if action is not None:
-                    action()
+                if type_id is not None:
+                    overworld.update_current_level(type_id)
+                    game()
+
+                else:
+                    if action is not None:
+                        action()
         else:
             screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)), (x, y))
-            font = pygame.font.Font(None, font_size)
+            font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
             text = font.render(message, True, 'white')
             screen.blit(text, (
                 x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
@@ -95,7 +99,7 @@ class SystemButton:
 
     def draw(self, x, y, image, message, font_size=50):
         screen.blit(pygame.transform.scale(load_image(image), (self.width, self.height)), (x, y))
-        font = pygame.font.Font(None, font_size)
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
         text = font.render(message, True, 'white')
         screen.blit(text,
                     (
@@ -105,6 +109,7 @@ class SystemButton:
 
 def show_menu():
     """ Отрисовка самого меню """
+
     menu_background = load_image('background.jpg')
     show_menu_f = True
     start_btn = Button(300, 70)
@@ -125,7 +130,6 @@ def show_menu():
         exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'Exit', 'btn_menu.png', terminate)
         help_btn.draw(WIDTH - 500, HEIGHT - 230, 'Help', 'btn_menu.png', help_menu)
         pygame.display.update()
-        clock.tick(60)
 
 
 def start_menu():
@@ -142,107 +146,9 @@ def start_menu():
 
 
 def game_cycle():
-    name = FunctionCallDrawing('images/background_2.jpg', [(460, 100), (460, 100)],
-                               [[(80, 80), 'Story mode', 'btn.png', story_mode],
-                                [(730, 80), 'PVP mode', 'btn.png', pvp_mode]])
+    name = FunctionCallDrawing('images/background_2.jpg', [(460, 100)],
+                               [[(80, 80), 'Story mode', 'btn.png', start_map_guide()]])
     name.run()
-
-
-def story_mode():
-    name = FunctionCallDrawing('images/background_5.jpg', [(540, 150), (460, 100), (460, 100)],
-                               [[(360, 80), 'NEW GAME', 'btn.png', story_mode_new_game],
-                                [(400, 260), 'STORE', 'btn.png', store_mode],
-                                [(400, 400), 'HEROES', 'btn.png', pvp_mode]
-                                ])
-    name.run()
-
-
-def story_mode_new_game():
-    name = FunctionCallDrawing('images/for_nickname.jpg', [(380, 70)],
-                               [[(880, 600), 'ok', 'btn.png', story_mode_new_game_select_heroes]])
-    name.run()
-
-
-def story_mode_new_game_select_heroes():
-    name = FunctionCallDrawing('images/select_heroes.jpg', [(380, 70)],
-                               [[(450, 620), 'select', 'btn.png', levels_show_menu]])
-    name.run()
-
-
-def levels_show_menu():
-    name = FunctionCallDrawing('images/start_level.jpg', [(500, 100)],
-                               [[(700, 560), 'start', 'btn.png', game]])
-    name.run()
-
-
-def pvp_mode():
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               # потом нужно будет исправить
-                               [[(145, 500), 'select', 'btn.png', pvp_mode_2],
-                                [(515, 500), 'select', 'btn.png', pvp_mode_2],
-                                [(885, 500), 'select', 'btn.png', pvp_mode_2]
-                                ])
-    name.run()
-
-
-def pvp_mode_2():
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               # потом нужно будет исправить
-                               [[(145, 500), 'start', 'btn.png', play_pvp_mode],
-                                [(515, 500), 'start', 'btn.png', play_pvp_mode],
-                                [(885, 500), 'start', 'btn.png', play_pvp_mode]
-                                ])
-    name.run()
-
-
-clock = pygame.time.Clock()
-
-
-def play_pvp_mode():
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'select', 'btn.png', buy_mage],
-                                [(515, 500), 'select', 'btn.png', buy_warrior],
-                                [(885, 500), 'select', 'btn.png', buy_archer]
-                                ])
-    name.run()
-
-
-def store_mode():
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'select', 'btn.png', buy_mage],
-                                [(515, 500), 'select', 'btn.png', buy_warrior],
-                                [(885, 500), 'select', 'btn.png', buy_archer]
-                                ])
-    name.run()
-
-
-def buy_mage():
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
-                                ])
-    name.run()  # потом нужно будет исправить
-
-
-def buy_warrior():
-    """ Отрисовка самого меню """
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
-                                ])
-    name.run()  # потом нужно будет исправить
-
-
-def buy_archer():
-    """ Отрисовка самого меню """
-    name = FunctionCallDrawing('images/buy_skin.jpg', [(250, 70), (250, 70), (250, 70)],
-                               [[(145, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(515, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes],
-                                [(885, 500), 'buy', 'btn.png', story_mode_new_game_select_heroes]
-                                ])
-    name.run()  # потом нужно будет исправить
 
 
 class FunctionCallDrawing:
@@ -250,6 +156,7 @@ class FunctionCallDrawing:
         self.back_im = backgroundimage
         self.w_h = w_h
         self.name_coords_fun = name_coords_fun
+
         self.buttons = []
         self.running = True
 
@@ -270,16 +177,25 @@ class FunctionCallDrawing:
 
             screen.blit(menu_background, (0, 0))
             for i in range(len(self.buttons)):
-                self.buttons[i].draw(self.name_coords_fun[i][0][0],
-                                     self.name_coords_fun[i][0][1],
-                                     self.name_coords_fun[i][1],
-                                     self.name_coords_fun[i][2],
-                                     self.name_coords_fun[i][3])
+                if len(self.name_coords_fun) >= 6:
+                    self.buttons[i].draw(self.name_coords_fun[i][0][0],
+                                         self.name_coords_fun[i][0][1],
+                                         self.name_coords_fun[i][1],
+                                         self.name_coords_fun[i][2],
+                                         self.name_coords_fun[i][3], type_id=self.name_coords_fun[i][4])
+                else:
+
+                    self.buttons[i].draw(self.name_coords_fun[i][0][0],
+                                         self.name_coords_fun[i][0][1],
+                                         self.name_coords_fun[i][1],
+                                         self.name_coords_fun[i][2],
+                                         self.name_coords_fun[i][3])
             pygame.display.update()
 
 
 class Level:
-    def __init__(self, path, surface):  # Принимает карту(список) и  скрин
+    def __init__(self, path, surface, p_cord, coins_coord, enemy_coord,
+                 const_coord, scroll_count):  # Принимает карту(список) и  скрин
 
         # level setup
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
@@ -295,6 +211,12 @@ class Level:
         self.water = pygame.sprite.Group()
         self.water_2 = pygame.sprite.Group()
         self.hit_animated = False
+
+        self.player_cords = p_cord
+        self.coins_cords = coins_coord
+        self.enemy_cords = enemy_coord
+        self.constrains_cords = const_coord
+        self.scroll_count = scroll_count
 
         self.gold_coins = pygame.sprite.Group()
         self.health_player_images = pygame.sprite.Group()
@@ -324,6 +246,7 @@ class Level:
         self.change = 20
         self.running_now = True
         self.death = False
+
         self.render()
 
         self.run()
@@ -373,36 +296,34 @@ class Level:
 
     def render(self):
 
-        self.travaler = Traveler((34 * 32, 12 * 32), self.screen, self.create_jump_particles, self.change)
+        self.travaler = Traveler(self.player_cords, self.screen, self.create_jump_particles, self.change)
         self.player_group.add(self.travaler)
         self.diamond_im = Diamond((10, 60), self.tile_size)
         self.diamond_coins.add(self.diamond_im)
 
-        spisok = [(58 * 32, 16 * 32), (48 * 32, 6 * 32)]
-        spisok_constrains = [(55 * 32, 6 * 32), (46 * 32, 6 * 32), (54 * 32, 16 * 32), (61 * 32, 16 * 32)]
-        spisok_coins_gold = [(40 * 32, 4 * 32)]
-        spisok_coins_silver = [(41 * 32, 4 * 32)]
-        spisok_coins_diamond = [(42 * 32, 4 * 32)]
-        spisok_health = [(43 * 32, 4 * 32)]
         for i in range(30):
             water = Water((i * 32 + 275 * i, 800), self.tile_size)
             self.water.add(water)
-        for pos in spisok:
+        for pos in self.enemy_cords:
             enemy = Mob(pos, self.tile_size, 40, 2)
             self.enemies.add(enemy)
-        for pos in spisok_coins_gold:
+        for pos in self.coins_cords[1]:
+            print(self.coins_cords[1])
+            print(pos)
+            print('error')
             enemy = Coin(pos, self.tile_size, 1)
             self.gold_coins.add(enemy)
 
-        for pos in spisok_coins_silver:
+        for pos in self.coins_cords[0]:
             enemy = Coin(pos, self.tile_size, 5)
+
             self.gold_coins.add(enemy)
 
-        for pos in spisok_coins_diamond:
+        for pos in self.coins_cords[2]:
             enemy = Coin(pos, self.tile_size, 2)
             self.gold_coins.add(enemy)
 
-        for pos in spisok_health:
+        for pos in self.coins_cords[3]:
             enemy = Coin(pos, self.tile_size, 3)
             self.gold_coins.add(enemy)
 
@@ -429,7 +350,7 @@ class Level:
                                                            image.get_width() * 2,
                                                            image.get_height() * 2))
 
-                        if (x_1, y_1) in spisok_constrains:
+                        if (x_1, y_1) in self.constrains_cords:
                             tile = Tile((x_1, y_1), self.tile_size, image)
                             self.constraints.add(tile)
                         else:
@@ -463,7 +384,7 @@ class Level:
         direction_x = self.travaler.direction
 
         if self.running_now:
-            self.world_shift = -385 * 2
+            self.world_shift = self.scroll_count
             self.travaler.speed = 0
 
         elif player_x < WIDTH / 4 and direction_x[0] < 0:
@@ -828,9 +749,17 @@ def about_widget():
 def game():
     running = True
 
-    level = Level("maps/level.tmx", screen)
+    level_map = overworld.return_map()
+    player_coordinates = overworld.return_hero_coords()
+    coins_coordinates = overworld.return_coins_coords()
+    enemy_coordinates = overworld.return_enemy_coords()
+    constrains_coordinates = overworld.return_constrains_coords()
+    scroll_count = overworld.return_scroll_x()
+    level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates, constrains_coordinates,
+                  scroll_count)
 
     while running:
+
         screen.fill('black')
 
         for event in pygame.event.get():
@@ -842,15 +771,28 @@ def game():
 
         if level.check_death():
             running = False
-        pygame.display.flip()
 
-        pygame.display.update()
+            level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates,
+                          constrains_coordinates,
+                          scroll_count)
+
+        pygame.display.flip()
         clock.tick(60)
 
+    start_map_guide()
 
-def get_event(sprite, event):
-    if sprite.rect.collidepoint(event.pos):
-        pass
+
+def start_map_guide():
+    name = FunctionCallDrawing('images/background_5.jpg',
+                               [(150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9),
+                                (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9)],
+                               [[(89, 67), '1 LEVEL', 'level_btn.png', game, 1],
+                                [(505, 67), '2 LEVEL', 'level_btn.png', game, 2],
+                                [(905, 67), '3 LEVEL', 'level_btn.png', game, 3],
+                                [(89, 400), '4 LEVEL', 'level_btn.png', game, 4],
+                                [(505, 400), '5 LEVEL', 'level_btn.png', game, 5],
+                                [(905, 400), '6 LEVEL', 'level_btn.png', game, 6]])
+    name.run()
 
 
 def terminate():
@@ -859,5 +801,4 @@ def terminate():
 
 
 if __name__ == '__main__':
-    game()
-
+    show_menu()
