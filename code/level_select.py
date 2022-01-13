@@ -6,6 +6,9 @@ class TravelGuide:
     def update_current_level(self, level_id):
         self.current_level = level_id
 
+    def update_current_level_pluse(self):
+        self.current_level += 1
+
     def return_map(self):
         if self.current_level == 1:
             return 'maps/level.tmx'
@@ -54,7 +57,7 @@ class TravelGuide:
             return [[[10 * 32, 15 * 32]], [[10 * 32, 15 * 32]], [[10 * 32, 15 * 32]], [[10 * 32, 15 * 32]]]
     def return_enemy_coords(self):
         if self.current_level == 1:
-            return [58 * 32, 16 * 32], [48 * 32, 6 * 32]
+            return [58 * 32, 16 * 32], [48 * 32, 6 * 32], [67 * 32, 11 * 32]
         if self.current_level == 2:
             return [58 * 32, 16 * 32], [48 * 32, 6 * 32]
         if self.current_level == 3:
@@ -68,7 +71,9 @@ class TravelGuide:
 
     def return_constrains_coords(self):
         if self.current_level == 1:
-            return [(55 * 32, 6 * 32), (46 * 32, 6 * 32), (54 * 32, 16 * 32), (61 * 32, 16 * 32)]
+            return [(55 * 32, 6 * 32), (46 * 32, 6 * 32),
+                    (54 * 32, 16 * 32), (61 * 32, 16 * 32),
+                    (64 * 32, 11 * 32), (73 * 32, 11 * 32)]
         if self.current_level == 2:
             return [(55 * 32, 6 * 32), (46 * 32, 6 * 32), (54 * 32, 16 * 32), (61 * 32, 16 * 32)]
         if self.current_level == 3:
@@ -93,6 +98,20 @@ class TravelGuide:
             return -370 * 2
         if self.current_level == 6:
             return -450 * 2
+
+    def return_mobs_damage_type_id(self):
+        if self.current_level == 1:
+            return 1, 20
+        if self.current_level == 2:
+            return 2, 20
+        if self.current_level == 3:
+            return 1, 20
+        if self.current_level == 4:
+            return 1, 20
+        if self.current_level == 5:
+            return 1, 20
+        if self.current_level == 6:
+            return 1, 20
 
 
 

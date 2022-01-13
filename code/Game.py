@@ -63,6 +63,7 @@ class Button:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.check_clicked = False
 
     def draw(self, x, y, message, button_image, action=None, font_size=30, type_id=None):
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
@@ -77,6 +78,7 @@ class Button:
             if clicked[0]:
                 pygame.mixer.Sound.play(MENU_BTN_SOUND)
                 pygame.time.delay(300)
+                self.check_clicked = True
                 if type_id is not None:
                     overworld.update_current_level(type_id)
                     game()
@@ -89,7 +91,10 @@ class Button:
             font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
             text = font.render(message, True, 'white')
             screen.blit(text, (
-                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
+                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))\
+
+
+
 
 
 class SystemButton:
@@ -124,11 +129,11 @@ def show_menu():
                 quit()
 
         screen.blit(menu_background, (0, 0))
-        start_btn.draw(WIDTH - 500, HEIGHT - 500, 'Start game', 'btn_menu.png', game_cycle)
-        settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'Settings', 'btn_menu.png', settings)
-        scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'Scores', 'btn_menu.png', scores)
-        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'Exit', 'btn_menu.png', terminate)
-        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'Help', 'btn_menu.png', help_menu)
+        start_btn.draw(WIDTH - 500, HEIGHT - 500, 'start game', 'btn_menu.png', start_map_guide)
+        settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'settings', 'btn_menu.png', settings)
+        scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'scores', 'btn_menu.png', scores)
+        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'exit', 'btn_menu.png', terminate)
+        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'help', 'btn_menu.png', help_menu)
         pygame.display.update()
 
 
@@ -145,10 +150,7 @@ def start_menu():
     pygame.quit()
 
 
-def game_cycle():
-    name = FunctionCallDrawing('images/background_2.jpg', [(460, 100)],
-                               [[(80, 80), 'Story mode', 'btn.png', start_map_guide()]])
-    name.run()
+
 
 
 class FunctionCallDrawing:
@@ -195,7 +197,7 @@ class FunctionCallDrawing:
 
 class Level:
     def __init__(self, path, surface, p_cord, coins_coord, enemy_coord,
-                 const_coord, scroll_count):  # Принимает карту(список) и  скрин
+                 const_coord, scroll_count, details):  # Принимает карту(список) и  скрин
 
         # level setup
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
@@ -211,6 +213,12 @@ class Level:
         self.water = pygame.sprite.Group()
         self.water_2 = pygame.sprite.Group()
         self.hit_animated = False
+
+        self.restart_draw_count = 0
+
+        self.score = 0
+        self.diamond_count = 0
+        self.mobs_details = details
 
         self.player_cords = p_cord
         self.coins_cords = coins_coord
@@ -243,9 +251,10 @@ class Level:
         self.tile_size = self.map.tilewidth * 2
         self.count_camera = 90
         self.coins_flag = False
-        self.change = 20
+        self.change = 10
         self.running_now = True
         self.death = False
+        self.passed = False
 
         self.render()
 
@@ -305,12 +314,9 @@ class Level:
             water = Water((i * 32 + 275 * i, 800), self.tile_size)
             self.water.add(water)
         for pos in self.enemy_cords:
-            enemy = Mob(pos, self.tile_size, 40, 2)
+            enemy = Mob(pos, self.tile_size, self.mobs_details[1], self.mobs_details[0])
             self.enemies.add(enemy)
         for pos in self.coins_cords[1]:
-            print(self.coins_cords[1])
-            print(pos)
-            print('error')
             enemy = Coin(pos, self.tile_size, 1)
             self.gold_coins.add(enemy)
 
@@ -455,6 +461,13 @@ class Level:
         if pygame.sprite.spritecollide(self.travaler, self.water, False):
             self.travaler.player_hp = 0
 
+    def checkpoint_collision(self):
+
+        if pygame.sprite.spritecollide(self.travaler, self.checkpoint, False):
+            overworld.update_current_level_pluse()
+            self.passed = True
+
+
     def check_enemy_collisions(self):
         global score
 
@@ -468,7 +481,7 @@ class Level:
                 if enemy_top < player_bottom < enemy_center and self.player_group.sprite.direction[1] >= 0:
                     self.player_group.sprite.direction[1] = -15
                     #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
-                    score += 20
+                    self.score += 20
 
                     enemy.kill()
                 else:
@@ -485,8 +498,7 @@ class Level:
                             self.count_hit_anim += 1
 
     def check_coins_collisions(self):
-        global score
-        global count_diamond
+
 
         coin_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.gold_coins, False)
 
@@ -495,10 +507,10 @@ class Level:
 
                 name, count = coin.collisions()
                 if name == 's':
-                    score += count
+                    self.score += count
                 elif name == 's_d':
-                    count_diamond += 1
-                    score += count
+                    self.diamond_count += 1
+                    self.score += count
                 elif name == 'h':
 
                     self.travaler.player_hp += count + 50
@@ -508,6 +520,7 @@ class Level:
                 coin.kill()
 
     def check_death(self):
+
         return True if self.death else False
 
     def rect_y_coins(self):
@@ -541,7 +554,7 @@ class Level:
         global score
 
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 20)
-        text = font.render(f"SCORE: {score}", True, (0, 0, 0))
+        text = font.render(f"SCORE: {score + self.score}", True, (0, 0, 0))
         text_x = 1080
         text_y = 20
         self.screen.blit(text, (text_x, text_y))
@@ -550,9 +563,43 @@ class Level:
         global count_diamond
 
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 25)
-        text = font.render(f"{count_diamond}", True, (0, 0, 0))
+        text = font.render(f"{self.diamond_count + count_diamond}", True, (0, 0, 0))
         text_x = 50
         text_y = 70
+        self.screen.blit(text, (text_x, text_y))
+
+    def draw_restart_text(self):
+
+
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 45)
+        text = font.render("press SPACE to restart", True, (255, 255, 255))
+        if self.restart_draw_count >= 30:
+            self.restart_draw_count = 0
+            if self.change > 0:
+                self.change *= - 1
+            else:
+                self.change *= - 1
+        else:
+            self.restart_draw_count += 1
+        text_x = 300
+        text_y = 650 + self.change
+        self.screen.blit(text, (text_x, text_y))
+
+    def draw_escape_text(self):
+
+
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 40)
+        text = font.render("press ENTER to continue or ESCAPE to exit", True, (255, 255, 255))
+        if self.restart_draw_count >= 30:
+            self.restart_draw_count = 0
+            if self.change > 0:
+                self.change *= - 1
+            else:
+                self.change *= - 1
+        else:
+            self.restart_draw_count += 1
+        text_x = 60
+        text_y = 650 + self.change
         self.screen.blit(text, (text_x, text_y))
 
     def run(self):
@@ -607,8 +654,52 @@ class Level:
 
         self.check_enemy_collisions()
         self.check_coins_collisions()
+        self.checkpoint_collision()
         self.water_collision()
         self.check_player_hp()
+
+    def draw_for_restart(self):
+
+
+        self.background_im.draw(self.screen)
+
+
+        self.decorations.draw(self.screen)
+
+
+        self.tiles.draw(self.screen)
+
+
+
+        self.constraints.draw(self.screen)
+
+
+        self.enemies.draw(self.screen)
+
+        self.gold_coins.draw(self.screen)
+
+
+        self.checkpoint.draw(self.screen)
+
+
+        self.water.draw(self.screen)
+        self.draw_score()
+        self.health()
+
+
+        self.diamond_coins.draw(self.screen)
+        self.draw_count_diamond()
+
+
+
+        self.player_group.draw(self.screen)
+
+        self.dust_sprite.draw(self.screen)
+
+
+        self.diamond_coins.draw(self.screen)
+
+
 
 
 def settings():
@@ -658,7 +749,7 @@ def scores():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    #     logging.warning('game exit by keys')
+
                     show = False
 
         screen.blit(menu_background, (0, 0))
@@ -747,6 +838,8 @@ def about_widget():
 
 
 def game():
+    global score
+    global count_diamond
     running = True
 
     level_map = overworld.return_map()
@@ -755,8 +848,9 @@ def game():
     enemy_coordinates = overworld.return_enemy_coords()
     constrains_coordinates = overworld.return_constrains_coords()
     scroll_count = overworld.return_scroll_x()
+    mobs_details = overworld.return_mobs_damage_type_id()
     level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates, constrains_coordinates,
-                  scroll_count)
+                  scroll_count, mobs_details)
 
     while running:
 
@@ -766,15 +860,60 @@ def game():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            escape_flag = True
+            while escape_flag:
+                level.draw_for_restart()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            escape_flag = False
+                            running = False
+                        if event.key == pygame.K_RETURN:
+                            escape_flag = False
+
+
+                level.draw_escape_text()
+
+                pygame.display.flip()
+                clock.tick(60)
 
         level.run()
 
-        if level.check_death():
-            running = False
+        if level.passed:
+            score += level.score
+            count_diamond += level.diamond_count
+            game()
 
-            level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates,
-                          constrains_coordinates,
-                          scroll_count)
+        if level.check_death():
+
+            restart_flag = True
+            while restart_flag:
+                level.draw_for_restart()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                level.draw_restart_text()
+
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_ESCAPE]:
+                    running = False
+                    restart_flag = False
+                if keys[pygame.K_SPACE]:
+                    restart_flag = False
+
+                    level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates,
+                                  constrains_coordinates,
+                                  scroll_count, mobs_details)
+                pygame.display.flip()
+                clock.tick(60)
 
         pygame.display.flip()
         clock.tick(60)
@@ -786,12 +925,12 @@ def start_map_guide():
     name = FunctionCallDrawing('images/background_5.jpg',
                                [(150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9),
                                 (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9)],
-                               [[(89, 67), '1 LEVEL', 'level_btn.png', game, 1],
-                                [(505, 67), '2 LEVEL', 'level_btn.png', game, 2],
-                                [(905, 67), '3 LEVEL', 'level_btn.png', game, 3],
-                                [(89, 400), '4 LEVEL', 'level_btn.png', game, 4],
-                                [(505, 400), '5 LEVEL', 'level_btn.png', game, 5],
-                                [(905, 400), '6 LEVEL', 'level_btn.png', game, 6]])
+                               [[(89, 67), '1 level', 'level_btn.png', game, 1],
+                                [(505, 67), '2 level', 'level_btn.png', game, 2],
+                                [(905, 67), '3 level', 'level_btn.png', game, 3],
+                                [(89, 400), '4 level', 'level_btn.png', game, 4],
+                                [(505, 400), '5 level', 'level_btn.png', game, 5],
+                                [(905, 400), '6 level', 'level_btn.png', game, 6]])
     name.run()
 
 

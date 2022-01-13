@@ -142,17 +142,17 @@ class Traveler(pygame.sprite.Sprite):
     def get_input(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
 
             self.direction[0] = 1
             self.direction_to_the_right = True
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_a]  or keys[pygame.K_LEFT]:
             self.direction[0] = -1
             self.direction_to_the_right = False
         else:
             self.direction[0] = 0
 
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
             self.jump()
 
             self.jump_particles(self.rect.midbottom)
