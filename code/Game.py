@@ -1,7 +1,7 @@
 import os
 import pygame
 import sys
-
+import sqlite3
 import pytmx
 
 from Mobs import Mob, Coin, Hp, Diamond, Water
@@ -33,6 +33,9 @@ MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 pos_of_player = [256, 448]
 overworld = TravelGuide()
 clock = pygame.time.Clock()
+player_name = ""
+con = sqlite3.connect('../database/scores.db')
+cur = con.cursor()
 
 
 def load_image(name, dictor='images', colorkey=None):
@@ -108,13 +111,22 @@ class Button:
                 screen.blit(text, (
                     x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
+    def is_clicked(self, x, y):
+        mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
+        clicked = pygame.mouse.get_pressed()
+        if (x < mouse_pos_x < x + self.width) and (y < mouse_pos_y < y + self.height):
+            if clicked[0]:
+                return True
+            else:
+                return False
+
 
 class SystemButton:
     def __init__(self, width, height):
         self.width = width
         self.height = height
 
-    def draw(self, x, y, image, message, font_size=20):
+    def draw(self, x, y, image, message, font_size=50):
         screen.blit(pygame.transform.scale(load_image(image), (self.width, self.height)), (x, y))
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
         text = font.render(message, True, 'white')
@@ -209,7 +221,6 @@ class Level:
                  const_coord, scroll_count, details):  # Принимает карту(список) и  скрин
 
         # level setup
-
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
 
         self.tiles = pygame.sprite.Group()
@@ -403,10 +414,11 @@ class Level:
         if self.running_now:
             self.world_shift = self.scroll_count
             self.travaler.speed = 0
+
         elif player_x < WIDTH / 4 and direction_x[0] < 0:
+
             self.world_shift = 6
             self.travaler.speed = 0
-
         elif player_x > WIDTH - (WIDTH / 4) and direction_x[0] > 0:
 
             self.world_shift = -6
@@ -478,6 +490,7 @@ class Level:
             self.passed = True
 
     def check_enemy_collisions(self):
+        global score
 
         enemy_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.enemies, False)
 
@@ -507,6 +520,8 @@ class Level:
                             self.count_hit_anim += 1
 
     def check_coins_collisions(self):
+        global score
+        global count_diamond
 
         coin_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.gold_coins, False)
 
@@ -516,9 +531,21 @@ class Level:
                 name, count = coin.collisions()
                 if name == 's':
                     self.score += count
+                    cur.execute(
+                        f"""UPDATE scores set score = {score} 
+                        where player_id = (select id from player where name = '{player_name}')""")
+                    con.commit()
                 elif name == 's_d':
-                    self.diamond_count += 1
+                    self.count_diamond += 1
                     self.score += count
+                    cur.execute(
+                        f"""UPDATE scores set score = {score} 
+                        where player_id = (select id from player where name = '{player_name}')""")
+                    cur.execute(
+                        f"""UPDATE scores set diamonds = {count_diamond} 
+                         where player_id = (select id from player where name = '{player_name}')""")
+
+                    con.commit()
                 elif name == 'h':
 
                     self.travaler.player_hp += count + 50
@@ -528,7 +555,6 @@ class Level:
                 coin.kill()
 
     def check_death(self):
-
         return True if self.death else False
 
     def rect_y_coins(self):
@@ -757,19 +783,51 @@ def settings():
 
 
 def scores():
-    menu_background = load_image('background_2.jpg')
+    menu_background = load_image('background_5.jpg')
+    font = pygame.font.Font('../graphics/font/ARCADEPI.TTF', 40)
+    base_font = pygame.font.Font(None, 32)
+    x_n = 150
+    x_s = 450
+    x_d = 750
+    y = 60
+    y_i = [120]
+
+    score_information = cur.execute(
+        f"""SELECT score, diamonds, player.name from scores, player WHERE player.id == player_id ORDER BY score""").fetchall()[
+                        ::-1]
+    for i in range(len(score_information)):
+        y_i.append(y_i[-1] + 60)
     show = True
     while show:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
+                terminate()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     show = False
-
-        screen.blit(menu_background, (0, 0))
+        text_name = font.render('Name', True, 'white')
+        text_score = font.render('Score', True, 'white')
+        text_diamonds = font.render('Diamonds', True, 'white')
+        screen.fill('black')
+        screen.blit(text_name, (x_n, y))
+        screen.blit(text_score, (x_s, y))
+        screen.blit(text_diamonds, (x_d, y))
+        if len(score_information) > 10:
+            for i in range(10):
+                surface_score = base_font.render(str(score_information[i][0]), True, 'white')
+                surface_diamond = base_font.render(str(score_information[i][1]), True, 'white')
+                surface_name = base_font.render(str(score_information[i][2]), True, 'white')
+                screen.blit(surface_score, (x_s + 60, y_i[i]))
+                screen.blit(surface_diamond, (x_d + 60, y_i[i]))
+                screen.blit(surface_name, (x_n, y_i[i]))
+        else:
+            for i in range(len(score_information)):
+                surface_score = base_font.render(str(score_information[i][0]), True, 'white')
+                surface_diamond = base_font.render(str(score_information[i][1]), True, 'white')
+                surface_name = base_font.render(str(score_information[i][2]), True, 'white')
+                screen.blit(surface_score, (x_s + 20, y_i[i]))
+                screen.blit(surface_diamond, (x_d + 20, y_i[i]))
+                screen.blit(surface_name, (x_n, y_i[i]))
         pygame.display.update()
 
 
@@ -957,6 +1015,77 @@ def game():
         clock.tick(60)
 
     start_map_guide()
+
+
+def start_player_input():
+    global score
+    global count_diamond
+
+    continue_btn = Button(350, 100)
+    base_font = pygame.font.Font(None, 48)
+    font = pygame.font.Font('../graphics/font/ARCADEPI.TTF', 40)
+    name = ""
+    input_rect = pygame.Rect(390, 320, 500, 65)
+    color_active = pygame.Color('lightskyblue3')
+    color_passive = pygame.Color('gray15')
+    color_rect = color_passive
+    active = False
+    pygame.key.set_repeat(250, 0)
+    if __name__ == "__main__":
+        running = True
+        while running:
+            for event in pygame.event.get():
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if input_rect.collidepoint(event.pos):
+                        active = True
+                    else:
+                        acive = False
+
+                if event.type == pygame.QUIT:
+                    running = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        active = True
+                        name = name[:-1]
+                    else:
+                        if active:
+                            if event.unicode.isalpha() or event.unicode.isdigit() or event.unicode == '_':
+                                name += event.unicode
+            screen.blit(load_image('background_5.jpg'), (0, 0))
+            if active:
+                color_rect = color_active
+            else:
+                color_rect = color_passive
+
+            pygame.draw.rect(screen, color_rect, input_rect, 2)
+
+            text_surface = base_font.render(name, True, ' white')
+            text = font.render('Input your name:', True, 'white')
+            if text_surface.get_width() > input_rect.w - 19:
+                active = False
+
+            screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 16))
+            screen.blit(text, (input_rect.x, input_rect.y - 46))
+            if continue_btn.is_clicked(450, 450):
+                player_name = name
+                players_in_bd = [i[0] for i in cur.execute(f"SELECT name from player").fetchall()]
+                length = len(players_in_bd) + 1
+                if name in players_in_bd:
+                    player_information = cur.execute(
+                        f"""SELECT score, diamonds, open_levels from scores 
+                        WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
+                    score = player_information[0][0]
+                    count_diamond = player_information[0][1]
+                    open_level = player_information[0][2]
+                else:
+                    cur.execute(f"""INSERT INTO player(name) VALUES('{name}')""")
+                    cur.execute(f"""INSERT INTO scores(id, player_id) VALUES({length}, {length}) """)
+                con.commit()
+            continue_btn.draw(450, 450, 'Continue', 'btn_menu.png', start_map_guide)
+
+            pygame.display.flip()
 
 
 def start_map_guide():
