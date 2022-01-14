@@ -173,10 +173,11 @@ class Traveler(pygame.sprite.Sprite):
     def jump(self):
         self.direction[1] = self.jump_speed
 
-    def update(self):
+    def update(self, flag):
         self.get_input()
         self.get_status()
-        self.animate()
+        if not flag:
+            self.animate()
         self.run_dust_animation()
         self.invincibility_timer()
 

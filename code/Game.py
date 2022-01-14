@@ -27,6 +27,7 @@ select_lang = 0
 animCount = 8
 score = 0
 count_diamond = 0
+count_enemy_kills = 0
 all_sprites = pygame.sprite.Group()
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 pos_of_player = [256, 448]
@@ -63,7 +64,6 @@ class Button:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.check_clicked = False
 
     def draw(self, x, y, message, button_image, action=None, font_size=30, type_id=None):
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
@@ -71,30 +71,42 @@ class Button:
         if (x < mouse_pos_x < x + self.width) and (y < mouse_pos_y < y + self.height):
             screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)),
                         (x, y - 5))
-            font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
-            text = font.render(message, True, 'white')
-            screen.blit(text, (
-                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
+
+            if type_id is not None:
+                font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size + 10)
+                text = font.render(message, True, 'white')
+                screen.blit(text, (
+                    x + ((self.width - text.get_width()) // 2) + 2, y + ((self.height - text.get_height()) // 2) + 25))
+            else:
+                font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size + 10)
+                text = font.render(message, True, 'white')
+                screen.blit(text, (
+                    x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
             if clicked[0]:
                 pygame.mixer.Sound.play(MENU_BTN_SOUND)
                 pygame.time.delay(300)
                 self.check_clicked = True
                 if type_id is not None:
-                    overworld.update_current_level(type_id)
-                    game()
+                    if overworld.check_open_level(type_id):
+                        overworld.update_current_level(type_id)
+                        game()
 
                 else:
                     if action is not None:
                         action()
         else:
             screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)), (x, y))
-            font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
-            text = font.render(message, True, 'white')
-            screen.blit(text, (
-                x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))\
 
-
-
+            if type_id is not None:
+                font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size + 10)
+                text = font.render(message, True, 'white')
+                screen.blit(text, (
+                    x + ((self.width - text.get_width()) // 2) + 2, y + ((self.height - text.get_height()) // 2) + 30))
+            else:
+                font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
+                text = font.render(message, True, 'white')
+                screen.blit(text, (
+                    x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2)))
 
 
 class SystemButton:
@@ -102,7 +114,7 @@ class SystemButton:
         self.width = width
         self.height = height
 
-    def draw(self, x, y, image, message, font_size=50):
+    def draw(self, x, y, image, message, font_size=20):
         screen.blit(pygame.transform.scale(load_image(image), (self.width, self.height)), (x, y))
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
         text = font.render(message, True, 'white')
@@ -148,9 +160,6 @@ def start_menu():
 
         pygame.display.flip()
     pygame.quit()
-
-
-
 
 
 class FunctionCallDrawing:
@@ -200,6 +209,7 @@ class Level:
                  const_coord, scroll_count, details):  # Принимает карту(список) и  скрин
 
         # level setup
+
         self.travaler = None  # по умолчанию None, пока не будет вызван класс
 
         self.tiles = pygame.sprite.Group()
@@ -245,6 +255,7 @@ class Level:
         self.layers = self.map.layers
         self.num_of_layers = len(self.layers)
         self.count_hit_anim = 0
+        self.enemy_kills = 0
 
         self.height_map = self.map.height
         self.width_map = self.map.width
@@ -392,11 +403,10 @@ class Level:
         if self.running_now:
             self.world_shift = self.scroll_count
             self.travaler.speed = 0
-
         elif player_x < WIDTH / 4 and direction_x[0] < 0:
-
             self.world_shift = 6
             self.travaler.speed = 0
+
         elif player_x > WIDTH - (WIDTH / 4) and direction_x[0] > 0:
 
             self.world_shift = -6
@@ -467,9 +477,7 @@ class Level:
             overworld.update_current_level_pluse()
             self.passed = True
 
-
     def check_enemy_collisions(self):
-        global score
 
         enemy_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.enemies, False)
 
@@ -482,6 +490,7 @@ class Level:
                     self.player_group.sprite.direction[1] = -15
                     #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
                     self.score += 20
+                    self.enemy_kills += 1
 
                     enemy.kill()
                 else:
@@ -498,7 +507,6 @@ class Level:
                             self.count_hit_anim += 1
 
     def check_coins_collisions(self):
-
 
         coin_collisions = pygame.sprite.spritecollide(self.player_group.sprite, self.gold_coins, False)
 
@@ -570,7 +578,6 @@ class Level:
 
     def draw_restart_text(self):
 
-
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 45)
         text = font.render("press SPACE to restart", True, (255, 255, 255))
         if self.restart_draw_count >= 30:
@@ -585,8 +592,33 @@ class Level:
         text_y = 650 + self.change
         self.screen.blit(text, (text_x, text_y))
 
-    def draw_escape_text(self):
+    def draw_final_text(self):
 
+        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 45)
+        font_for_win = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 50)
+        text = font.render("press ESCAPE to go to the menu", True, (255, 255, 255))
+        text_score = font.render(f"Your score: {score}", True, (255, 255, 255))
+        text_win = font_for_win.render("You passed the game", True, (255, 255, 255))
+        text_diamond = font.render(f"Number of diamonds: {count_diamond}", True, (255, 255, 255))
+        text_count_kills = font.render(f"Number of kills: {count_enemy_kills}", True, (255, 255, 255))
+
+        if self.restart_draw_count > 20:
+            self.restart_draw_count = 0
+            if self.change > 0:
+                self.change *= - 1
+            else:
+                self.change *= - 1
+        else:
+            self.restart_draw_count += 1
+        text_x = WIDTH // 2 - text.get_width() // 2
+        text_y = 650 + self.change
+        self.screen.blit(text, (text_x, text_y))
+        self.screen.blit(text_win, (WIDTH // 2 - text_win.get_width() // 2, 15))
+        self.screen.blit(text_score, (20, 150))
+        self.screen.blit(text_diamond, (20, 250))
+        self.screen.blit(text_count_kills, (20, 350))
+
+    def draw_escape_text(self):
 
         font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 40)
         text = font.render("press ENTER to continue or ESCAPE to exit", True, (255, 255, 255))
@@ -630,7 +662,7 @@ class Level:
         self.checkpoint.update(self.world_shift)
         self.checkpoint.draw(self.screen)
 
-        self.player_group.update()
+        self.player_group.update(self.running_now)
         self.horizontal_movement_collision()
         self.get_player_on_ground()
         self.vertical_movement_collision()
@@ -660,46 +692,32 @@ class Level:
 
     def draw_for_restart(self):
 
-
         self.background_im.draw(self.screen)
-
 
         self.decorations.draw(self.screen)
 
-
         self.tiles.draw(self.screen)
 
-
-
         self.constraints.draw(self.screen)
-
 
         self.enemies.draw(self.screen)
 
         self.gold_coins.draw(self.screen)
 
-
         self.checkpoint.draw(self.screen)
-
 
         self.water.draw(self.screen)
         self.draw_score()
         self.health()
 
-
         self.diamond_coins.draw(self.screen)
         self.draw_count_diamond()
-
-
 
         self.player_group.draw(self.screen)
 
         self.dust_sprite.draw(self.screen)
 
-
         self.diamond_coins.draw(self.screen)
-
-
 
 
 def settings():
@@ -749,7 +767,6 @@ def scores():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-
                     show = False
 
         screen.blit(menu_background, (0, 0))
@@ -840,6 +857,7 @@ def about_widget():
 def game():
     global score
     global count_diamond
+    global count_enemy_kills
     running = True
 
     level_map = overworld.return_map()
@@ -877,7 +895,6 @@ def game():
                         if event.key == pygame.K_RETURN:
                             escape_flag = False
 
-
                 level.draw_escape_text()
 
                 pygame.display.flip()
@@ -888,7 +905,29 @@ def game():
         if level.passed:
             score += level.score
             count_diamond += level.diamond_count
-            game()
+            count_enemy_kills += level.enemy_kills
+            if overworld.current_level == 7:
+                final_form = True
+
+                while final_form:
+                    screen.fill('black')
+
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                running = False
+                                final_form = False
+
+                    level.draw_final_text()
+
+                    pygame.display.flip()
+                    clock.tick(60)
+
+            else:
+                game()
 
         if level.check_death():
 
@@ -899,19 +938,18 @@ def game():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            running = False
+                            restart_flag = False
+                        if event.key == pygame.K_SPACE:
+                            restart_flag = False
+                            level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates,
+                                          constrains_coordinates,
+                                          scroll_count, mobs_details)
 
                 level.draw_restart_text()
 
-                keys = pygame.key.get_pressed()
-                if keys[pygame.K_ESCAPE]:
-                    running = False
-                    restart_flag = False
-                if keys[pygame.K_SPACE]:
-                    restart_flag = False
-
-                    level = Level(level_map, screen, player_coordinates, coins_coordinates, enemy_coordinates,
-                                  constrains_coordinates,
-                                  scroll_count, mobs_details)
                 pygame.display.flip()
                 clock.tick(60)
 
@@ -922,15 +960,58 @@ def game():
 
 
 def start_map_guide():
+    if overworld.check_open_level(1):
+        first_level_image = 'test_btn.png'
+        first_level_text = '1 Level'
+    else:
+        first_level_image = 'test_btn.png'
+        first_level_text = '1 Level'
+
+    if overworld.check_open_level(2):
+        second_level_image = 'test_btn.png'
+        second_level_text = '2 Level'
+    else:
+        second_level_image = 'test_btn_close.png'
+        second_level_text = ''
+
+    if overworld.check_open_level(3):
+        third_level_image = 'test_btn_2_1.png'
+        third_level_text = '3 Level'
+    else:
+        third_level_image = 'test_btn_2_1_close.png'
+        third_level_text = ''
+
+    if overworld.check_open_level(4):
+        fourth_level_image = 'test_btn_2_1.png'
+        fourth_level_text = '4 Level'
+    else:
+        fourth_level_image = 'test_btn_2_1_close.png'
+        fourth_level_text = ''
+
+    if overworld.check_open_level(5):
+        fifth_level_image = 'test_btn_4_1.png'
+        fifth_level_text = '5 Level'
+    else:
+        fifth_level_image = 'test_btn_4_1_close.png'
+        fifth_level_text = ''
+
+    if overworld.check_open_level(6):
+        sixth_level_image = 'test_btn_4_1.png'
+        sixth_level_text = '6 Level'
+    else:
+        sixth_level_image = 'test_btn_4_1_close.png'
+        sixth_level_text = ''
+
     name = FunctionCallDrawing('images/background_5.jpg',
-                               [(150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9),
-                                (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9), (150 * 1.9, 100 * 1.9)],
-                               [[(89, 67), '1 level', 'level_btn.png', game, 1],
-                                [(505, 67), '2 level', 'level_btn.png', game, 2],
-                                [(905, 67), '3 level', 'level_btn.png', game, 3],
-                                [(89, 400), '4 level', 'level_btn.png', game, 4],
-                                [(505, 400), '5 level', 'level_btn.png', game, 5],
-                                [(905, 400), '6 level', 'level_btn.png', game, 6]])
+                               [(150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9),
+                                (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9)],
+                               [[(89, 27), first_level_text, first_level_image, game, 1],
+                                [(505, 27), second_level_text, second_level_image, game, 2],
+                                [(905, 27), third_level_text, third_level_image, game, 3],
+                                [(89, 360), fourth_level_text, fourth_level_image, game, 4],
+                                [(505, 360), fifth_level_text, fifth_level_image, game, 5],
+                                [(905, 360), sixth_level_text, sixth_level_image, game, 6]])
+
     name.run()
 
 

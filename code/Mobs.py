@@ -139,7 +139,7 @@ class Coin(AnimatedTile):
         elif self.type_id == 2:
             return 's_d', 30
         elif self.type_id == 3:
-            return 'h', 20
+            return 'h', 30
         return 's', 5
 
 
