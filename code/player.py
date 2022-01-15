@@ -4,6 +4,8 @@ from math import sin
 
 import pygame
 
+pygame.init()
+JUMP_SOUND = pygame.mixer.Sound('sounds/jump.wav')
 
 def load_image(name, dictor='', colorkey=None):
     fullname = os.path.join(dictor, name)
@@ -153,6 +155,7 @@ class Traveler(pygame.sprite.Sprite):
             self.direction[0] = 0
 
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground:
+            pygame.mixer.Sound.play(JUMP_SOUND)
             self.jump()
 
             self.jump_particles(self.rect.midbottom)

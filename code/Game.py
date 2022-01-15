@@ -29,7 +29,6 @@ score = 0
 count_diamond = 0
 count_enemy_kills = 0
 all_sprites = pygame.sprite.Group()
-MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
 pos_of_player = [256, 448]
 overworld = TravelGuide()
 clock = pygame.time.Clock()
@@ -59,6 +58,18 @@ def load_image(name, dictor='images', colorkey=None):
 DIFFICULTY = ['easy', 'normal', 'hard', 'cheat']
 LANGUAGES = ['en', 'ru']
 MENU_BTN_SOUND = pygame.mixer.Sound('sounds/menu_btn.wav')
+POWER_UP_SOUND = pygame.mixer.Sound('sounds/power_up.wav')
+FOR_MENU_SOUND = pygame.mixer.Sound('sounds/for_menu.wav')
+FOR_OTHER_SOUND = pygame.mixer.Sound('sounds/for_other.wav')
+COIN_SOUND = pygame.mixer.Sound('sounds/coin.wav')
+HIT_SOUND = pygame.mixer.Sound('sounds/hit.wav')
+GAME_OVER_SOUND = pygame.mixer.Sound('sounds/g_over.wav')
+KILL_SOUND = pygame.mixer.Sound('sounds/stomp.wav')
+POWER_UP_SOUND.set_volume(0.1)
+COIN_SOUND.set_volume(0.1)
+FOR_MENU_SOUND.set_volume(0.1)
+FOR_OTHER_SOUND.set_volume(0.1)
+now_play = FOR_OTHER_SOUND
 
 
 class Button:
@@ -68,12 +79,13 @@ class Button:
         self.width = width
         self.height = height
 
-    def draw(self, x, y, message, button_image, action=None, font_size=30, type_id=None):
+    def draw(self, x, y, message, button_image, action=None, font_size=30, type_id=None, not_image=False):
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed()
         if (x < mouse_pos_x < x + self.width) and (y < mouse_pos_y < y + self.height):
-            screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)),
-                        (x, y - 5))
+            if not not_image:
+                screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)),
+                            (x, y - 5))
 
             if type_id is not None:
                 font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size + 10)
@@ -86,8 +98,13 @@ class Button:
                 screen.blit(text, (
                     x + ((self.width - text.get_width()) // 2), y + ((self.height - text.get_height()) // 2) - 5))
             if clicked[0]:
+
                 pygame.mixer.Sound.play(MENU_BTN_SOUND)
+
+                pygame.mixer.Sound.stop(now_play)
+
                 pygame.time.delay(300)
+
                 self.check_clicked = True
                 if type_id is not None:
                     if overworld.check_open_level(type_id):
@@ -97,8 +114,11 @@ class Button:
                 else:
                     if action is not None:
                         action()
+                        pygame.mixer.Sound.play(now_play)
+
         else:
-            screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)), (x, y))
+            if not not_image:
+                screen.blit(pygame.transform.scale(load_image(button_image), (self.width, self.height)), (x, y))
 
             if type_id is not None:
                 font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size + 10)
@@ -128,7 +148,7 @@ class SystemButton:
 
     def draw(self, x, y, image, message, font_size=50):
         screen.blit(pygame.transform.scale(load_image(image), (self.width, self.height)), (x, y))
-        font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', font_size)
+        font = pygame.font.Font(None, font_size)
         text = font.render(message, True, 'white')
         screen.blit(text,
                     (
@@ -137,15 +157,24 @@ class SystemButton:
 
 
 def show_menu():
+    global now_play
     """ Отрисовка самого меню """
 
-    menu_background = load_image('background.jpg')
+    pygame.mixer.Sound.stop(now_play)
+
+    menu_background = load_image('for_menu_3.png')
+    now_play = FOR_MENU_SOUND
+    pygame.mixer.Sound.play(now_play)
+
     show_menu_f = True
     start_btn = Button(300, 70)
     settings_btn = Button(300, 70)
     scores_btn = Button(300, 70)
     help_btn = Button(300, 70)
     exit_btn = Button(300, 70)
+    font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 60)
+    text = font.render("Traveler:", True, (0, 255, 255))
+
     while show_menu_f:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -153,67 +182,15 @@ def show_menu():
                 quit()
 
         screen.blit(menu_background, (0, 0))
-        start_btn.draw(WIDTH - 500, HEIGHT - 500, 'start game', 'btn_menu.png', start_map_guide)
-        settings_btn.draw(WIDTH - 500, HEIGHT - 410, 'settings', 'btn_menu.png', settings)
-        scores_btn.draw(WIDTH - 500, HEIGHT - 320, 'scores', 'btn_menu.png', scores)
-        exit_btn.draw(WIDTH - 500, HEIGHT - 140, 'exit', 'btn_menu.png', terminate)
-        help_btn.draw(WIDTH - 500, HEIGHT - 230, 'help', 'btn_menu.png', help_menu)
+        start_btn.draw(WIDTH // 2 - text.get_width() // 2, HEIGHT - 500, 'start', 'btn_menu.png', start_player_input,
+                       font_size=40)
+        settings_btn.draw(WIDTH // 2 - text.get_width() // 2, HEIGHT - 410, 'settings', 'btn_menu.png', settings,
+                          font_size=40)
+        scores_btn.draw(WIDTH // 2 - text.get_width() // 2, HEIGHT - 320, 'scores', 'btn_menu.png', scores,
+                        font_size=40)
+        exit_btn.draw(WIDTH // 2 - text.get_width() // 2, HEIGHT - 140, 'exit', 'btn_menu.png', terminate, font_size=40)
+        help_btn.draw(WIDTH // 2 - text.get_width() // 2, HEIGHT - 230, 'help', 'btn_menu.png', help_menu, font_size=40)
         pygame.display.update()
-
-
-def start_menu():
-    running = True
-
-    show_menu()
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        pygame.display.flip()
-    pygame.quit()
-
-
-class FunctionCallDrawing:
-    def __init__(self, backgroundimage, w_h, name_coords_fun):
-        self.back_im = backgroundimage
-        self.w_h = w_h
-        self.name_coords_fun = name_coords_fun
-
-        self.buttons = []
-        self.running = True
-
-    def run(self):
-        menu_background = pygame.image.load(self.back_im)
-
-        for i in self.w_h:
-            self.buttons.append(Button(i[0], i[1]))
-
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.running = False
-
-            screen.blit(menu_background, (0, 0))
-            for i in range(len(self.buttons)):
-                if len(self.name_coords_fun) >= 6:
-                    self.buttons[i].draw(self.name_coords_fun[i][0][0],
-                                         self.name_coords_fun[i][0][1],
-                                         self.name_coords_fun[i][1],
-                                         self.name_coords_fun[i][2],
-                                         self.name_coords_fun[i][3], type_id=self.name_coords_fun[i][4])
-                else:
-
-                    self.buttons[i].draw(self.name_coords_fun[i][0][0],
-                                         self.name_coords_fun[i][0][1],
-                                         self.name_coords_fun[i][1],
-                                         self.name_coords_fun[i][2],
-                                         self.name_coords_fun[i][3])
-            pygame.display.update()
 
 
 class Level:
@@ -504,14 +481,17 @@ class Level:
                     #  explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
                     self.score += 20
                     self.enemy_kills += 1
+                    pygame.mixer.Sound.play(KILL_SOUND)
 
                     enemy.kill()
                 else:
 
                     self.travaler.get_damage(enemy.return_hit())
+
                     if not self.hit_animated:
                         self.hit_animated = True
                         self.create_hit_particles()
+                        pygame.mixer.Sound.play(HIT_SOUND)
                     else:
                         if self.count_hit_anim == 10:
                             self.hit_animated = False
@@ -531,22 +511,15 @@ class Level:
                 name, count = coin.collisions()
                 if name == 's':
                     self.score += count
-                    cur.execute(
-                        f"""UPDATE scores set score = {score} 
-                        where player_id = (select id from player where name = '{player_name}')""")
-                    con.commit()
-                elif name == 's_d':
-                    self.count_diamond += 1
-                    self.score += count
-                    cur.execute(
-                        f"""UPDATE scores set score = {score} 
-                        where player_id = (select id from player where name = '{player_name}')""")
-                    cur.execute(
-                        f"""UPDATE scores set diamonds = {count_diamond} 
-                         where player_id = (select id from player where name = '{player_name}')""")
+                    pygame.mixer.Sound.play(COIN_SOUND)
 
-                    con.commit()
+                elif name == 's_d':
+                    self.diamond_count += 1
+                    self.score += count
+                    pygame.mixer.Sound.play(COIN_SOUND)
+
                 elif name == 'h':
+                    pygame.mixer.Sound.play(POWER_UP_SOUND)
 
                     self.travaler.player_hp += count + 50
                     if self.travaler.player_hp > 300:
@@ -566,6 +539,7 @@ class Level:
     def check_player_hp(self):
         if self.travaler.player_hp <= 0:
             self.death = True
+            pygame.mixer.Sound.play(GAME_OVER_SOUND)
 
     def diamond(self):
 
@@ -746,12 +720,21 @@ class Level:
         self.diamond_coins.draw(self.screen)
 
 
+def text_write(x, y, message, font_size=50):
+    font = pygame.font.Font(None, font_size)
+    text = font.render(message, True, 'white')
+    screen.blit(text,
+                (x + ((400 - text.get_width()) // 2), y + ((135 - text.get_height()) // 2)))
+
+
 def settings():
-    settings_background = load_image('background_5.jpg')
-    volume_btn = SystemButton(400, 135)
-    difficulty_btn = SystemButton(400, 135)
-    language_btn = SystemButton(400, 135)
-    change_lang_btn = Button(40, 40)
+    global now_play
+    pygame.mixer.Sound.stop(now_play)
+
+    now_play = FOR_OTHER_SOUND
+    pygame.mixer.Sound.play(FOR_OTHER_SOUND)
+
+    settings_background = load_image('for_menu.png')
     quiet_btn = Button(40, 15)
     loud_btn = Button(40, 40)
     easier_btn = Button(40, 15)
@@ -767,23 +750,27 @@ def settings():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     show = False
+                    show_menu()
+        now_play = FOR_OTHER_SOUND
         screen.blit(settings_background, (0, 0))
-        volume_btn.draw(460, 50, 'settings_btns.png', f'Volume {volume}%')
-        difficulty_btn.draw(460, 200, 'settings_btns.png', f"Difficulty: {DIFFICULTY[change_difficult]}", 40)
-        language_btn.draw(460, 350, 'settings_btns.png', f'Language: {LANGUAGES[select_lang]}')
-        about_btn.draw(460, 500, 'About', 'settings_btns.png', about_widget)
-
-        quiet_btn.draw(500, 110, '', 'minus_btn.png', quiet_volume)
-        loud_btn.draw(780, 95, '', 'plus_btn.png', loud_volume)
-        easier_btn.draw(500, 260, '', 'minus_btn.png', reduce_difficult)
-        harder_btn.draw(780, 245, '', 'plus_btn.png', increase_difficult)
-        change_lang_btn.draw(780, 395, '', 'plus_btn.png', change_language)
-
+        quiet_btn.draw(480, 120, '', 'minus_btn.png', quiet_volume)
+        loud_btn.draw(760, 105, '', 'plus_btn.png', loud_volume)
+        text_write(440, 60, f"Volume: {volume}%")
+        easier_btn.draw(480, 260, '', 'minus_btn.png', reduce_difficult)
+        harder_btn.draw(760, 245, '', 'plus_btn.png', increase_difficult)
+        text_write(440, 200, f"Difficult: {DIFFICULTY[change_difficult]}", 40)
+        about_btn.draw(445, 500, 'About', 'settings_btns.png', about_widget)
         pygame.display.update()
 
 
 def scores():
-    menu_background = load_image('background_5.jpg')
+    global now_play
+    pygame.mixer.Sound.stop(now_play)
+
+    now_play = FOR_OTHER_SOUND
+    pygame.mixer.Sound.play(now_play)
+
+    menu_background = load_image('for_menu.png')
     font = pygame.font.Font('../graphics/font/ARCADEPI.TTF', 40)
     base_font = pygame.font.Font(None, 32)
     x_n = 150
@@ -805,6 +792,8 @@ def scores():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     show = False
+                    pygame.mixer.Sound.stop(now_play)
+                    show_menu()
         text_name = font.render('Name', True, 'white')
         text_score = font.render('Score', True, 'white')
         text_diamonds = font.render('Diamonds', True, 'white')
@@ -832,9 +821,137 @@ def scores():
 
 
 def help_menu():
-    about = load_image('background_5.jpg')
+    pygame.mixer.Sound.play(FOR_OTHER_SOUND)
+    now_play = FOR_OTHER_SOUND
+    about = load_image('for_menu.png')
     show = True
+    count = 0
+    anim_count = 1
+    animations_A_key = [load_image('A.png', dictor='../graphics/keyboard/'),
+                        load_image('A_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_A_key = [pygame.transform.scale(i,
+                                               (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                        animations_A_key]
+    animations_D_key = [load_image('D.png', dictor='../graphics/keyboard/'),
+                        load_image('D_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_D_key = [pygame.transform.scale(i,
+                                               (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                        animations_D_key]
+
+    animations_left_key = [load_image('Left.png', dictor='../graphics/keyboard/'),
+                           load_image('Left_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_left_key = [pygame.transform.scale(i,
+                                                  (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                           animations_left_key]
+
+    animations_right_key = [load_image('Right.png', dictor='../graphics/keyboard/'),
+                            load_image('Right_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_right_key = [pygame.transform.scale(i,
+                                                   (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                            animations_right_key]
+
+    animations_W_key = [load_image('W.png', dictor='../graphics/keyboard/'),
+                        load_image('W_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_W_key = [pygame.transform.scale(i,
+                                               (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                        animations_W_key]
+
+    animations_UP_key = [load_image('UP.png', dictor='../graphics/keyboard/'),
+                         load_image('UP_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_UP_key = [pygame.transform.scale(i,
+                                                (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                         animations_UP_key]
+
+    animations_space_key = [load_image('Space.png', dictor='../graphics/keyboard/'),
+                            load_image('Space_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_space_key = [pygame.transform.scale(i,
+                                                   (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                            animations_space_key]
+
+    animations_escape_key = [load_image('Escape.png', dictor='../graphics/keyboard/'),
+                             load_image('Escape_Pressed.png', dictor='../graphics/keyboard/')]
+    animations_escape_key = [pygame.transform.scale(i,
+                                                    (int(i.get_width() // 2), int(i.get_height() // 2))) for i in
+                             animations_escape_key]
+
+    animations_mob = [load_image('Walk_1.png', dictor='../graphics/enemies/Walk/'),
+                      load_image('Walk_2.png', dictor='../graphics/enemies/Walk/'),
+                      load_image('Walk_3.png', dictor='../graphics/enemies/Walk/'),
+                      load_image('Walk_4.png', dictor='../graphics/enemies/Walk/')]
+    animations_mob = [pygame.transform.scale(i,
+                                             (int(i.get_width() * 4), int(i.get_height() * 4))) for i in
+                      animations_mob]
+    animations_coin = [load_image('MonedaD_1.png', dictor='../graphics/Coins/'),
+                       load_image('MonedaD_2.png', dictor='../graphics/Coins/'),
+                       load_image('MonedaD_3.png', dictor='../graphics/Coins/'),
+                       load_image('MonedaD_4.png', dictor='../graphics/Coins/'),
+                       load_image('MonedaD_5.png', dictor='../graphics/Coins/')
+                       ]
+    animations_coin = [pygame.transform.scale(i,
+                                             (int(i.get_width() * 4), int(i.get_height() * 4))) for i in
+                      animations_coin]
+
+    font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 45)
+    text = font.render("keys to move horizontally", True, (0, 0, 0))
+    text1 = font.render("jump", True, (0, 0, 0))
+    text2= font.render("return", True, (0, 0, 0))
+    text3 = font.render("enemy. they deal damage carefully", True, (0, 0, 0))
+    text4 = font.render("coins that increase your scoreboard", True, (0, 0, 0))
+    text_r = font.render("press ESCAPE to restart", True, (21, 21, 21))
+    text_x = 500
+    text_y = 50
+    count_for_mob = 0
+
+    count_for_coin = 0
     while show:
+        screen.fill('grey')
+        screen.blit(text, (text_x, text_y))
+        screen.blit(text1, (800, 160))
+        screen.blit(text2, (170, 270))
+        screen.blit(text3, (170, 370))
+        screen.blit(text4, (170, 470))
+
+        if count > 1000:
+            anim_count *= -1
+            count = 0
+
+
+        else:
+            count += 1
+            if anim_count > 0:
+                screen.blit(animations_A_key[0], (20, 30))
+                screen.blit(animations_D_key[0], (130, 30))
+                screen.blit(animations_left_key[0], (280, 30))
+                screen.blit(animations_right_key[0], (390, 30))
+                screen.blit(animations_W_key[0], (20, 140))
+                screen.blit(animations_UP_key[0], (130, 140))
+                screen.blit(animations_space_key[0], (240, 140))
+                screen.blit(animations_escape_key[0], (20, 250))
+                screen.blit(text_r, (WIDTH // 2 - text_r.get_width() // 2, 620))
+
+
+            else:
+                screen.blit(animations_A_key[1], (20, 30))
+                screen.blit(animations_D_key[1], (130, 30))
+                screen.blit(animations_left_key[1], (280, 30))
+                screen.blit(animations_right_key[1], (390, 30))
+                screen.blit(animations_W_key[1], (20, 140))
+                screen.blit(animations_UP_key[1], (130, 140))
+                screen.blit(animations_space_key[1], (240, 140))
+                screen.blit(animations_escape_key[1], (20, 250))
+                screen.blit(text_r, (WIDTH // 2 - text_r.get_width() // 2, 620 - 10))
+        if count_for_mob >= 3:
+            count_for_mob = 0
+        else:
+            count_for_mob += 0.01
+
+        if count_for_coin >= 4:
+            count_for_coin = 0
+        else:
+            count_for_coin += 0.01
+        screen.blit(animations_mob[int(count_for_mob)], (10, 320))
+        screen.blit(animations_coin[int(count_for_coin)], (25, 450))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -842,9 +959,11 @@ def help_menu():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    show = False
+                    pygame.mixer.Sound.stop(now_play)
 
-        screen.blit(about, (0, 0))
+                    show = False
+                    show_menu()
+
         pygame.display.update()
 
 
@@ -885,16 +1004,6 @@ def reduce_difficult():
         change_difficult = 3
 
 
-def change_language():
-    global select_lang
-    language_btn = SystemButton(400, 135)
-    select_lang += 1
-    if select_lang == 2:
-        select_lang = 0
-        language_btn.draw(460, 510, 'settings_btns.png', f'Language: {LANGUAGES[select_lang % 2]}')
-    language_btn.draw(460, 510, 'settings_btns.png', f'Language: {LANGUAGES[select_lang % 2]}')
-
-
 def about_widget():
     about = pygame.transform.scale(load_image('about.png'), (700, 600))
     show = True
@@ -906,6 +1015,7 @@ def about_widget():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
+                    pygame.mixer.Sound.stop(now_play)
                     show = False
 
         screen.blit(about, (300, 40))
@@ -961,9 +1071,18 @@ def game():
         level.run()
 
         if level.passed:
+
             score += level.score
             count_diamond += level.diamond_count
             count_enemy_kills += level.enemy_kills
+            cur.execute(
+                f"""UPDATE scores set score = {score} 
+                                   where player_id = (select id from player where name = '{player_name}')""")
+            cur.execute(
+                f"""UPDATE scores set diamonds = {count_diamond} 
+                                    where player_id = (select id from player where name = '{player_name}')""")
+
+            con.commit()
             if overworld.current_level == 7:
                 final_form = True
 
@@ -1013,6 +1132,7 @@ def game():
 
         pygame.display.flip()
         clock.tick(60)
+    print(1)
 
     start_map_guide()
 
@@ -1020,6 +1140,10 @@ def game():
 def start_player_input():
     global score
     global count_diamond
+    global now_play
+    pygame.mixer.Sound.stop(now_play)
+    now_play = FOR_OTHER_SOUND
+    pygame.mixer.Sound.play(now_play)
 
     continue_btn = Button(350, 100)
     base_font = pygame.font.Font(None, 48)
@@ -1041,19 +1165,24 @@ def start_player_input():
                         active = True
                     else:
                         acive = False
-
                 if event.type == pygame.QUIT:
-                    running = False
+                    pygame.quit()
+                    quit()
 
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                        show_menu()
+
                     if event.key == pygame.K_BACKSPACE:
                         active = True
                         name = name[:-1]
+
                     else:
                         if active:
                             if event.unicode.isalpha() or event.unicode.isdigit() or event.unicode == '_':
                                 name += event.unicode
-            screen.blit(load_image('background_5.jpg'), (0, 0))
+            screen.blit(load_image('for_menu.png'), (0, 0))
             if active:
                 color_rect = color_active
             else:
@@ -1089,6 +1218,10 @@ def start_player_input():
 
 
 def start_map_guide():
+    global now_play
+    pygame.mixer.Sound.stop(now_play)
+    now_play = FOR_OTHER_SOUND
+
     if overworld.check_open_level(1):
         first_level_image = 'test_btn.png'
         first_level_text = '1 Level'
@@ -1131,17 +1264,37 @@ def start_map_guide():
         sixth_level_image = 'test_btn_4_1_close.png'
         sixth_level_text = ''
 
-    name = FunctionCallDrawing('images/background_5.jpg',
-                               [(150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9),
-                                (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9), (150 * 1.9, 130 * 1.9)],
-                               [[(89, 27), first_level_text, first_level_image, game, 1],
-                                [(505, 27), second_level_text, second_level_image, game, 2],
-                                [(905, 27), third_level_text, third_level_image, game, 3],
-                                [(89, 360), fourth_level_text, fourth_level_image, game, 4],
-                                [(505, 360), fifth_level_text, fifth_level_image, game, 5],
-                                [(905, 360), sixth_level_text, sixth_level_image, game, 6]])
+    menu_background = load_image('for_menu.png')
+    running = True
+    first_level = Button(150 * 1.9, 130 * 1.9)
+    second_level = Button(150 * 1.9, 130 * 1.9)
+    third_level = Button(150 * 1.9, 130 * 1.9)
+    fourth_level = Button(150 * 1.9, 130 * 1.9)
+    fifth_level = Button(150 * 1.9, 130 * 1.9)
+    sixth_level = Button(150 * 1.9, 130 * 1.9)
 
-    name.run()
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+                    pygame.mixer.Sound.stop(now_play)
+                    show_menu()
+
+        screen.blit(menu_background, (0, 0))
+
+        first_level.draw(89, 27, first_level_text, first_level_image, game, type_id=1, font_size=40)
+        second_level.draw(505, 27, second_level_text, second_level_image, game, type_id=2, font_size=40)
+        third_level.draw(905, 27, third_level_text, third_level_image, game, type_id=3, font_size=40)
+        fourth_level.draw(89, 360, fourth_level_text, fourth_level_image, game, type_id=4, font_size=40)
+        fifth_level.draw(505, 360, fifth_level_text, fifth_level_image, game, type_id=5, font_size=40)
+        sixth_level.draw(905, 360, sixth_level_text, sixth_level_image, game, type_id=6, font_size=40)
+
+        pygame.display.update()
 
 
 def terminate():
