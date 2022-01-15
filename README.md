@@ -1,6 +1,6 @@
+# ![Alt-текст](resources/logo.png "Logo")
 Traveller: In Search of Treasures
 ========================
-https://www.canva.com/design/DAE1c4aoVnE/83BJIf7NyF0OACJyaXNycA/view?utm_content=DAE1c4aoVnE&utm_campaign=designshare&utm_medium=link&utm_source=sharebutton
 
 ## Оглавление
 
@@ -49,3 +49,5 @@ https://www.canva.com/design/DAE1c4aoVnE/83BJIf7NyF0OACJyaXNycA/view?utm_content
 ## Внешний вид
 ![Alt-текст](resources/menu_screen.png "Внешний вид меню") ![Alt-текст](resources/help_screen.png "Внешний вид Помощи по игре")
 ![Alt-текст](resources/play_screen.png "Внешний игрового процесса") ![Alt-текст](resources/endgame_screen.png "Внешний окончания игры")
+
+
