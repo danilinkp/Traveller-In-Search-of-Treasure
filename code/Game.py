@@ -17,8 +17,8 @@ pygame.init()
 pygame.display.set_caption('pygame-project')
 
 SIZE = WIDTH, HEIGHT = 1280, 764
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-# screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
 left = False
 right = False
 volume = 60
@@ -782,6 +782,7 @@ def scores():
     score_information = cur.execute(
         f"""SELECT score, diamonds, player.name from scores, player WHERE player.id == player_id ORDER BY score""").fetchall()[
                         ::-1]
+    print(score_information)
     for i in range(len(score_information)):
         y_i.append(y_i[-1] + 60)
     show = True
@@ -888,13 +889,13 @@ def help_menu():
                        load_image('MonedaD_5.png', dictor='../graphics/Coins/')
                        ]
     animations_coin = [pygame.transform.scale(i,
-                                             (int(i.get_width() * 4), int(i.get_height() * 4))) for i in
-                      animations_coin]
+                                              (int(i.get_width() * 4), int(i.get_height() * 4))) for i in
+                       animations_coin]
 
     font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 45)
     text = font.render("keys to move horizontally", True, (0, 0, 0))
     text1 = font.render("jump", True, (0, 0, 0))
-    text2= font.render("return", True, (0, 0, 0))
+    text2 = font.render("return", True, (0, 0, 0))
     text3 = font.render("enemy. they deal damage carefully", True, (0, 0, 0))
     text4 = font.render("coins that increase your scoreboard", True, (0, 0, 0))
     text_r = font.render("press ESCAPE to restart", True, (21, 21, 21))
@@ -1026,6 +1027,7 @@ def game():
     global score
     global count_diamond
     global count_enemy_kills
+    global player_name
     running = True
 
     level_map = overworld.return_map()
@@ -1071,7 +1073,7 @@ def game():
         level.run()
 
         if level.passed:
-
+            print(player_name)
             score += level.score
             count_diamond += level.diamond_count
             count_enemy_kills += level.enemy_kills
@@ -1138,9 +1140,11 @@ def game():
 
 
 def start_player_input():
+    global player_name
     global score
     global count_diamond
     global now_play
+    global count_enemy_kills
     pygame.mixer.Sound.stop(now_play)
     now_play = FOR_OTHER_SOUND
     pygame.mixer.Sound.play(now_play)
@@ -1197,22 +1201,25 @@ def start_player_input():
 
             screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 16))
             screen.blit(text, (input_rect.x, input_rect.y - 46))
-            if continue_btn.is_clicked(450, 450):
-                player_name = name
-                players_in_bd = [i[0] for i in cur.execute(f"SELECT name from player").fetchall()]
-                length = len(players_in_bd) + 1
-                if name in players_in_bd:
-                    player_information = cur.execute(
-                        f"""SELECT score, diamonds, open_levels from scores 
-                        WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
-                    score = player_information[0][0]
-                    count_diamond = player_information[0][1]
-                    open_level = player_information[0][2]
-                else:
-                    cur.execute(f"""INSERT INTO player(name) VALUES('{name}')""")
-                    cur.execute(f"""INSERT INTO scores(id, player_id) VALUES({length}, {length}) """)
-                con.commit()
-            continue_btn.draw(450, 450, 'Continue', 'btn_menu.png', start_map_guide)
+            if name:
+                if continue_btn.is_clicked(450, 450):
+                    player_name = name
+                    players_in_bd = [str(i[0]) for i in cur.execute(f"SELECT name from player").fetchall()]
+                    length = len(players_in_bd) + 1
+                    if str(name) in players_in_bd:
+                        player_information = cur.execute(
+                            f"""SELECT score, diamonds, open_levels from scores 
+                            WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
+                        score = player_information[0][0]
+                        print(score)
+                        count_diamond = player_information[0][1]
+                        open_level = player_information[0][2]
+                        count_enemy_kills = player_information[0][3]
+                    else:
+                        cur.execute(f"""INSERT INTO player(name) VALUES('{name}')""")
+                        cur.execute(f"""INSERT INTO scores(id, player_id) VALUES({length}, {length}) """)
+                    con.commit()
+                continue_btn.draw(450, 450, 'Continue', 'btn_menu.png', start_map_guide)
 
             pygame.display.flip()
 
