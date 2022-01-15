@@ -8,7 +8,7 @@ class TravelGuide:
                             3: 'close',
                             4: 'close',
                             5: 'close',
-                            6: 'open'
+                            6: 'close'
                             }
 
     def update_current_level(self, level_id):
@@ -22,6 +22,21 @@ class TravelGuide:
     def update_current_level_pluse(self):
         self.current_level += 1
         self.levels_open[self.current_level] = 'open'
+
+    def update_open_levels(self, count):
+        for i in range(count):
+            self.levels_open[i + 1] = 'open'
+
+    def return_open_levels(self):
+        count = 0
+        for i in range(5):
+            if self.levels_open[i + 1] == 'open':
+                count += 1
+            else:
+                break
+        return count
+
+
 
     def return_map(self):
         if self.current_level == 1:

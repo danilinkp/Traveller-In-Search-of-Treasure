@@ -17,11 +17,11 @@ pygame.init()
 pygame.display.set_caption('pygame-project')
 
 SIZE = WIDTH, HEIGHT = 1280, 764
-# screen = pygame.display.set_mode((WIDTH, HEIGHT))
-screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
+#screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 left = False
 right = False
-volume = 60
+volume = 0.5
 change_difficult = 0
 select_lang = 0
 animCount = 8
@@ -65,10 +65,7 @@ COIN_SOUND = pygame.mixer.Sound('sounds/coin.wav')
 HIT_SOUND = pygame.mixer.Sound('sounds/hit.wav')
 GAME_OVER_SOUND = pygame.mixer.Sound('sounds/g_over.wav')
 KILL_SOUND = pygame.mixer.Sound('sounds/stomp.wav')
-POWER_UP_SOUND.set_volume(0.1)
-COIN_SOUND.set_volume(0.1)
-FOR_MENU_SOUND.set_volume(0.1)
-FOR_OTHER_SOUND.set_volume(0.1)
+
 now_play = FOR_OTHER_SOUND
 
 
@@ -139,21 +136,6 @@ class Button:
                 return True
             else:
                 return False
-
-
-class SystemButton:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-    def draw(self, x, y, image, message, font_size=50):
-        screen.blit(pygame.transform.scale(load_image(image), (self.width, self.height)), (x, y))
-        font = pygame.font.Font(None, font_size)
-        text = font.render(message, True, 'white')
-        screen.blit(text,
-                    (
-                        x + ((self.width - text.get_width()) // 2),
-                        y + ((self.height - text.get_height()) // 2)))
 
 
 def show_menu():
@@ -341,15 +323,7 @@ class Level:
                     y_1 = y * self.tile_size
 
                     if image:
-                        #  < TiledTileLayer[2]: "background_mountains" > 1
-                        #  < TiledTileLayer[4]: "decoration" >,2
-                        #  < TiledTileLayer[8]: "checkpoint" >,3
-                        #  < TiledTileLayer[3]: "background_trees" >,4
-                        #  < TiledTileLayer[5]: "water" >,5
-                        #  < TiledTileLayer[7]: "grass" >,6
-                        #  < TiledTileLayer[6]: "boxes" >,7
-                        #  < TiledTileLayer[1]: "landscape" >8
-                        #  < TiledTileLayer[9]: "cubes" >]9
+
                         image = pygame.transform.scale(image,
                                                        (
                                                            image.get_width() * 2,
@@ -733,15 +707,13 @@ def settings():
 
     now_play = FOR_OTHER_SOUND
     pygame.mixer.Sound.play(FOR_OTHER_SOUND)
-
-    settings_background = load_image('for_menu.png')
-    quiet_btn = Button(40, 15)
-    loud_btn = Button(40, 40)
-    easier_btn = Button(40, 15)
-    harder_btn = Button(40, 40)
-    about_btn = Button(400, 135)
+    disables = Button(100, 100)
+    enabled = Button(100, 100)
+    pluse = Button(100, 100)
+    minuse = Button(100, 100)
     show = True
     while show:
+        screen.fill('grey')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -751,15 +723,15 @@ def settings():
                 if event.key == pygame.K_ESCAPE:
                     show = False
                     show_menu()
+        disables.draw(WIDTH // 2 - 300, HEIGHT // 2, '', 'disabled.png', disabled_volume
+                      )
+        enabled.draw(WIDTH // 2 - 100, HEIGHT // 2, '', 'enabled.png', enabled_volume
+                      )
+        pluse.draw(WIDTH // 2 + 100, HEIGHT // 2, '', 'pluse.png', loud_volume
+                      )
+        minuse.draw(WIDTH // 2 + 300, HEIGHT // 2, '', 'minuse.png', quiet_volume
+                      )
         now_play = FOR_OTHER_SOUND
-        screen.blit(settings_background, (0, 0))
-        quiet_btn.draw(480, 120, '', 'minus_btn.png', quiet_volume)
-        loud_btn.draw(760, 105, '', 'plus_btn.png', loud_volume)
-        text_write(440, 60, f"Volume: {volume}%")
-        easier_btn.draw(480, 260, '', 'minus_btn.png', reduce_difficult)
-        harder_btn.draw(760, 245, '', 'plus_btn.png', increase_difficult)
-        text_write(440, 200, f"Difficult: {DIFFICULTY[change_difficult]}", 40)
-        about_btn.draw(445, 500, 'About', 'settings_btns.png', about_widget)
         pygame.display.update()
 
 
@@ -824,7 +796,7 @@ def scores():
 def help_menu():
     pygame.mixer.Sound.play(FOR_OTHER_SOUND)
     now_play = FOR_OTHER_SOUND
-    about = load_image('for_menu.png')
+
     show = True
     count = 0
     anim_count = 1
@@ -970,57 +942,65 @@ def help_menu():
 
 def loud_volume():
     global volume
-    volume_btn = SystemButton(400, 135)
-    volume += 10
-    volume_btn.draw(460, 200, 'settings_btns.png', f'Volume {volume}%')
-    if volume == 110:
+    volume += 0.1
+    if volume == 1.1:
         volume = 0
+
+    MENU_BTN_SOUND.set_volume(volume)
+
+    POWER_UP_SOUND.set_volume(volume)
+    FOR_MENU_SOUND.set_volume(volume)
+    FOR_OTHER_SOUND.set_volume(volume)
+    COIN_SOUND.set_volume(volume)
+    HIT_SOUND.set_volume(volume)
+    GAME_OVER_SOUND.set_volume(volume)
+    KILL_SOUND.set_volume(volume)
 
 
 def quiet_volume():
     global volume
-    volume_btn = SystemButton(400, 135)
-    volume -= 10
-    volume_btn.draw(460, 200, 'settings_btns.png', f'Volume {volume}%')
-    if volume == -10:
-        volume = 100
+    volume -= 0.1
+    if volume == -0.1:
+        volume = 1
+    MENU_BTN_SOUND.set_volume(volume)
+
+    POWER_UP_SOUND.set_volume(volume)
+    FOR_MENU_SOUND.set_volume(volume)
+    FOR_OTHER_SOUND.set_volume(volume)
+    COIN_SOUND.set_volume(volume)
+    HIT_SOUND.set_volume(volume)
+    GAME_OVER_SOUND.set_volume(volume)
+    KILL_SOUND.set_volume(volume)
+
+def disabled_volume():
+    global volume
+    volume = 0
+    MENU_BTN_SOUND.set_volume(volume)
+
+    POWER_UP_SOUND.set_volume(volume)
+    FOR_MENU_SOUND.set_volume(volume)
+    FOR_OTHER_SOUND.set_volume(volume)
+    COIN_SOUND.set_volume(volume)
+    HIT_SOUND.set_volume(volume)
+    GAME_OVER_SOUND.set_volume(volume)
+    KILL_SOUND.set_volume(volume)
+
+def enabled_volume():
+    global volume
+    volume = 0.5
+    MENU_BTN_SOUND.set_volume(volume)
+
+    POWER_UP_SOUND.set_volume(volume)
+    FOR_MENU_SOUND.set_volume(volume)
+    FOR_OTHER_SOUND.set_volume(volume)
+    COIN_SOUND.set_volume(volume)
+    HIT_SOUND.set_volume(volume)
+    GAME_OVER_SOUND.set_volume(volume)
+    KILL_SOUND.set_volume(volume)
 
 
-def increase_difficult():
-    global change_difficult
-    difficulty_btn = SystemButton(400, 135)
-    change_difficult += 1
-    if change_difficult == 4:
-        change_difficult = 0
-        difficulty_btn.draw(460, 355, 'settings_btns.png', f"Difficulty: {DIFFICULTY[change_difficult]}")
-    difficulty_btn.draw(460, 355, 'settings_btns.png', f"Difficulty: {DIFFICULTY[change_difficult]}")
 
 
-def reduce_difficult():
-    global change_difficult
-    difficulty_btn = SystemButton(400, 135)
-    change_difficult -= 1
-    difficulty_btn.draw(460, 355, 'settings_btns.png', f"Difficulty: {DIFFICULTY[change_difficult]}")
-    if change_difficult == -1:
-        change_difficult = 3
-
-
-def about_widget():
-    about = pygame.transform.scale(load_image('about.png'), (700, 600))
-    show = True
-    while show:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.mixer.Sound.stop(now_play)
-                    show = False
-
-        screen.blit(about, (300, 40))
-        pygame.display.update()
 
 
 def game():
@@ -1083,6 +1063,9 @@ def game():
             cur.execute(
                 f"""UPDATE scores set diamonds = {count_diamond} 
                                     where player_id = (select id from player where name = '{player_name}')""")
+            cur.execute(
+                f"""UPDATE scores set open_levels = {overworld.return_open_levels()} 
+                                                where player_id = (select id from player where name = '{player_name}')""")
 
             con.commit()
             if overworld.current_level == 7:
@@ -1208,12 +1191,12 @@ def start_player_input():
                     length = len(players_in_bd) + 1
                     if str(name) in players_in_bd:
                         player_information = cur.execute(
-                            f"""SELECT score, diamonds, open_levels from scores 
-                            WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
+                            f"""SELECT score, diamonds, open_levels, enemies from scores 
+                                                    WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
                         score = player_information[0][0]
-                        print(score)
                         count_diamond = player_information[0][1]
                         open_level = player_information[0][2]
+                        overworld.update_open_levels(open_level)
                         count_enemy_kills = player_information[0][3]
                     else:
                         cur.execute(f"""INSERT INTO player(name) VALUES('{name}')""")
