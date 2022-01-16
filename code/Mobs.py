@@ -6,6 +6,7 @@ from tiles import AnimatedTile
 
 
 def load_image(name, dictor='', colorkey=None):
+    """ Функция для загрузки изображения """
     fullname = os.path.join(dictor, name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
@@ -23,6 +24,8 @@ def load_image(name, dictor='', colorkey=None):
 
 
 class Mob(AnimatedTile):
+    """ Класс, в котором реализован весь функционал мобов """
+
     def __init__(self, pos, size, hit_count, id):
         type_id = id
         if type_id == 1:
@@ -48,10 +51,9 @@ class Mob(AnimatedTile):
         self.check_flag = 1
         self.hit_count = hit_count
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
-
-        self.animations = [pygame.transform.scale(i,
-                                                  (int(i.get_width() * 2), int(i.get_height() * 2))) for i in
+    def loading_hero_sprites(self):
+        """ Импорт спрайтов для игрока """
+        self.animations = [pygame.transform.scale(i, (int(i.get_width() * 2), int(i.get_height() * 2))) for i in
                            self.animations]
 
     def move(self):
@@ -65,12 +67,15 @@ class Mob(AnimatedTile):
         return self.image.get_width()
 
     def reverse(self):
+        """Меняет направление моба"""
         self.speed *= -1
 
     def return_speed(self):
+        """Возвращает скорость передвижения моба"""
         return self.speed
 
     def return_hit(self):
+        """Возвращает урон который наносит моб"""
         return self.hit_count
 
     def update(self, x_shift):
@@ -81,6 +86,8 @@ class Mob(AnimatedTile):
 
 
 class Coin(AnimatedTile):
+    """ Класс, в котором реализован функционал монет """
+
     def __init__(self, pos, size, type_id):
         self.animations = []
         self.type_id = type_id
@@ -90,7 +97,8 @@ class Coin(AnimatedTile):
         super().__init__(pos, size, self.animations)
         self.rect.y += size - self.image.get_size()[1]
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
+    def loading_hero_sprites(self):
+        """Импорт спрайтов для монет"""
         if self.type_id == 1:
             animations_test = [load_image('../graphics/Coins/MonedaD_1.png'),
                                load_image('../graphics/Coins/MonedaD_2.png'),
@@ -140,6 +148,7 @@ class Coin(AnimatedTile):
         self.animate()
 
     def collisions(self):
+        """Возвращает ценность монет при столкновении с игроком"""
         if self.type_id == 1:
             return 's', 10
         elif self.type_id == 2:
@@ -150,13 +159,16 @@ class Coin(AnimatedTile):
 
 
 class Hp:
+    """Класс, в котором реализованы жизни игрока"""
+
     def __init__(self):
         self.animations = []
         self.animations_dict = {'full': '', 'half': '', 'few': '', 'Not': ''}
 
         self.loading_hero_sprites()
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
+    def loading_hero_sprites(self):
+        """Импорт спрайтов для жизней """
 
         animations_test = [load_image('../graphics/Health/health_player_1.png'),
                            load_image('../graphics/Health/health_player_2.png'),
@@ -176,6 +188,7 @@ class Hp:
         self.animations_dict['not'] = self.animations[3]
 
     def return_image(self, count_hp):
+        """Возвращает есть ли сердечка, или нет"""
         if count_hp > 260:
             return [self.animations_dict['full'], self.animations_dict['full'], self.animations_dict['full']]
         if 230 < count_hp <= 260:
@@ -199,6 +212,8 @@ class Hp:
 
 
 class Diamond(AnimatedTile):
+    """Класс, в котором реализованы алмазы"""
+
     def __init__(self, pos, size):
         self.animations = []
 
@@ -207,7 +222,8 @@ class Diamond(AnimatedTile):
         super().__init__(pos, size, self.animations)
         self.rect.y += size - self.image.get_size()[1]
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
+    def loading_hero_sprites(self):
+        """Импорт спрайтов для алмазов"""
 
         animations_test = [load_image('../graphics/Coins/frame0000.png'),
                            load_image('../graphics/Coins/frame0001.png'),
@@ -228,16 +244,18 @@ class Diamond(AnimatedTile):
 
 
 class Water(AnimatedTile):
+    """Класс, в котором реализован функционал воды"""
+
     def __init__(self, pos, size):
         self.animations = []
-
 
         self.loading_hero_sprites()
 
         super().__init__(pos, size, self.animations)
         self.rect.y += size - self.image.get_size()[1]
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
+    def loading_hero_sprites(self):
+        """Импорт спрайтов для водички"""
 
         animations_test = [load_image('../graphics/water/1.png'),
                            load_image('../graphics/water/2.png'),

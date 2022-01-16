@@ -1,13 +1,14 @@
 import os
 import sys
-from math import sin
 
 import pygame
 
 pygame.init()
 JUMP_SOUND = pygame.mixer.Sound('sounds/jump.wav')
 
+
 def load_image(name, dictor='', colorkey=None):
+    """ Функция для загрузки изображения """
     fullname = os.path.join(dictor, name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
@@ -25,6 +26,8 @@ def load_image(name, dictor='', colorkey=None):
 
 
 class Traveler(pygame.sprite.Sprite):
+    """Основной класс, в котором реализован функционал игрока"""
+
     def __init__(self, pos, screen, jump_particles, change_health):
         super().__init__()
         self.animations_dict = {'idle': [],
@@ -69,7 +72,8 @@ class Traveler(pygame.sprite.Sprite):
         self.hurt_time = 0
         self.player_hp = 300
 
-    def loading_hero_sprites(self):  # импорт спрайтов для игрока
+    def loading_hero_sprites(self):
+        """импорт спрайтов для игрока"""
         animations_test = {'idle': [load_image('../graphics/character/idle/1.png'),
                                     load_image('../graphics/character/idle/2.png'),
                                     load_image('../graphics/character/idle/3.png'),
@@ -91,7 +95,8 @@ class Traveler(pygame.sprite.Sprite):
                                        (int(i.get_width() * 2), int(i.get_height() * 2)))
             self.animations_dict['run'].append(i)
 
-    def loading_dust_sprites(self):  # импорт частиц
+    def loading_dust_sprites(self):
+        """Импорт частиц"""
 
         self.dust_run_particles = [load_image('../graphics/character/dust_particles/run/run_1.png'),
                                    load_image('../graphics/character/dust_particles/run/run_2.png'),
@@ -100,6 +105,7 @@ class Traveler(pygame.sprite.Sprite):
                                    load_image('../graphics/character/dust_particles/run/run_5.png')]
 
     def animate(self):
+        """Реализует анимацию игрока"""
         animation = self.animations_dict[self.status]
         # вид движения на данный момент
         if self.count > 8:  # Счетчик
@@ -121,7 +127,8 @@ class Traveler(pygame.sprite.Sprite):
         # set the rect
         self.set_the_rect()
 
-    def run_dust_animation(self):  # прорисовка дастов
+    def run_dust_animation(self):
+        """прорисовка дастов"""
         if self.status == 'run' and self.on_ground:
             if self.dust_animation_count > 3:  # Счетчик
                 self.dust_frame_index = (self.dust_frame_index + 1) % len(self.dust_run_particles)
@@ -142,13 +149,14 @@ class Traveler(pygame.sprite.Sprite):
                                  (self.rect.bottomright[0] - 15, self.rect.bottomright[1] - 10))
 
     def get_input(self):
+        """Осуществляет передвижение игрока кнопками"""
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
 
             self.direction[0] = 1
             self.direction_to_the_right = True
-        elif keys[pygame.K_a]  or keys[pygame.K_LEFT]:
+        elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.direction[0] = -1
             self.direction_to_the_right = False
         else:
@@ -161,6 +169,7 @@ class Traveler(pygame.sprite.Sprite):
             self.jump_particles(self.rect.midbottom)
 
     def get_status(self):
+        """Возвращает статус игрока"""
         if self.direction[1] < 0 or self.direction[1] > 1:
             self.status = 'idle'
         else:
@@ -170,10 +179,12 @@ class Traveler(pygame.sprite.Sprite):
                 self.status = 'idle'
 
     def apply_gravity(self):
+        """Прыжок"""
         self.direction[1] += self.gravity
         self.rect.y += self.direction[1]
 
     def jump(self):
+        """Прыжок"""
         self.direction[1] = self.jump_speed
 
     def update(self, flag):
@@ -200,20 +211,19 @@ class Traveler(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(midtop=self.rect.midtop)
 
     def get_damage(self, hit):
+        """Получение урона"""
         if not self.invincible:
-
             self.player_hp -= hit
             self.invincible = True
             self.hurt_time = pygame.time.get_ticks()
-        print(self.player_hp)
 
     def invincibility_timer(self):
+        """Неуязвимость на некоторое количество времени"""
         if self.invincible:
             current_time = pygame.time.get_ticks()
             if current_time - self.hurt_time >= self.invincibility_duration:
                 self.invincible = False
 
     def return_hp(self):
+        """Возвращает жизни игрока"""
         return self.player_hp
-
-

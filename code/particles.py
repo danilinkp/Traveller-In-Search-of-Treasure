@@ -1,6 +1,5 @@
 import os
 import sys
-
 import pygame
 
 
@@ -22,6 +21,8 @@ def load_image(name, dictor='', colorkey=None):
 
 
 class ParticleEffect(pygame.sprite.Sprite):
+    """Класс, в котором реализованы всякого рода частицы"""
+
     def __init__(self, pos, type_of_movement):
         super().__init__()
         self.frame_index = 0
@@ -51,7 +52,7 @@ class ParticleEffect(pygame.sprite.Sprite):
                            ]
 
             self.frames = [pygame.transform.scale(i,
-                                                  (int(i.get_width()) , int(i.get_height()))) for i in
+                                                  (int(i.get_width()), int(i.get_height()))) for i in
                            self.frames]
         if type_of_movement == 'land':
             self.frames = [load_image('../graphics/character/dust_particles/land/land_1.png'),
@@ -67,17 +68,13 @@ class ParticleEffect(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
 
     def animate(self):
-
         # Счетчик
         if self.count == 1:
             self.frame_index += 1.3
         else:
             self.count += 1
-
         if self.frame_index >= len(self.frames):
-
             self.kill()  # удаляет спрайт из всех групп
-
         else:
             self.image = self.frames[int(self.frame_index)]
 
@@ -87,23 +84,16 @@ class ParticleEffect(pygame.sprite.Sprite):
 
 
 class HitEffect(ParticleEffect):
+    """Класс, который отрисовывает эффект получения урона"""
+
     def __init__(self, pos, type_of_movement):
         super().__init__(pos, 'hit')
 
-
-
-
     def animate(self):
-
         # Счетчик
-
         self.frame_index += 1
-
-
         if self.frame_index >= len(self.frames):
-
             self.kill()  # удаляет спрайт из всех групп
-
         else:
             self.image = self.frames[int(self.frame_index)]
 
@@ -113,7 +103,3 @@ class HitEffect(ParticleEffect):
 
     def return_frame(self):
         return self.frame_index
-
-
-
-

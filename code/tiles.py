@@ -2,14 +2,12 @@ import pygame
 
 
 class Tile(pygame.sprite.Sprite):
+    """Класс, который отвечает за прорисовку карты"""
+
     def __init__(self, pos, size, image):
         super().__init__()
-        # print(size)
         self.image = image
         self.mask = pygame.mask.from_surface(self.image)
-        # print(image)
-        # self.image = pygame.Surface((size, size))
-
         self.rect = self.image.get_rect(topleft=pos)
 
     def update(self, x_shift):
@@ -17,6 +15,8 @@ class Tile(pygame.sprite.Sprite):
 
 
 class AnimatedTile(Tile):
+    """Класс, который реализует анимированные тайлы"""
+
     def __init__(self, pos, size, sprites):
         self.frames = sprites
         self.frame_index = 0
@@ -27,6 +27,7 @@ class AnimatedTile(Tile):
         self.image = self.frames[self.frame_index]
 
     def animate(self):
+        """Непосредственно анимирует тайлы"""
         self.frame_index += 0.15
         if self.frame_index >= len(self.frames):
             self.frame_index = 0
