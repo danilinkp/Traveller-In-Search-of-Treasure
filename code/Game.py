@@ -17,7 +17,7 @@ pygame.init()
 pygame.display.set_caption('pygame-project')
 
 SIZE = WIDTH, HEIGHT = 1280, 764
-#screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 left = False
 right = False
@@ -65,6 +65,7 @@ COIN_SOUND = pygame.mixer.Sound('sounds/coin.wav')
 HIT_SOUND = pygame.mixer.Sound('sounds/hit.wav')
 GAME_OVER_SOUND = pygame.mixer.Sound('sounds/g_over.wav')
 KILL_SOUND = pygame.mixer.Sound('sounds/stomp.wav')
+FINAL_SOUND = pygame.mixer.Sound('sounds/final_sound.wav')
 
 now_play = FOR_OTHER_SOUND
 
@@ -111,7 +112,8 @@ class Button:
                 else:
                     if action is not None:
                         action()
-                        pygame.mixer.Sound.play(now_play)
+                        pygame.mixer.Sound.play(now_play, loops=-1)
+
 
         else:
             if not not_image:
@@ -137,16 +139,17 @@ class Button:
             else:
                 return False
 
-
 def show_menu():
     global now_play
     """ Отрисовка самого меню """
+
 
     pygame.mixer.Sound.stop(now_play)
 
     menu_background = load_image('for_menu_3.png')
     now_play = FOR_MENU_SOUND
-    pygame.mixer.Sound.play(now_play)
+    pygame.mixer.Sound.play(now_play, loops=-1)
+
 
     show_menu_f = True
     start_btn = Button(300, 70)
@@ -157,7 +160,10 @@ def show_menu():
     font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 60)
     text = font.render("Traveler:", True, (0, 255, 255))
 
+
     while show_menu_f:
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -456,7 +462,6 @@ class Level:
                     self.score += 20
                     self.enemy_kills += 1
                     pygame.mixer.Sound.play(KILL_SOUND)
-
                     enemy.kill()
                 else:
 
@@ -514,6 +519,7 @@ class Level:
         if self.travaler.player_hp <= 0:
             self.death = True
             pygame.mixer.Sound.play(GAME_OVER_SOUND)
+
 
     def diamond(self):
 
@@ -706,14 +712,18 @@ def settings():
     pygame.mixer.Sound.stop(now_play)
 
     now_play = FOR_OTHER_SOUND
-    pygame.mixer.Sound.play(FOR_OTHER_SOUND)
+    pygame.mixer.Sound.play(FOR_OTHER_SOUND, loops=-1)
+
     disables = Button(100, 100)
     enabled = Button(100, 100)
     pluse = Button(100, 100)
     minuse = Button(100, 100)
     show = True
+    font = pygame.font.Font('../graphics/font/ARCADEPI.ttf', 60)
+    text = font.render(f"volume:{round(volume, 1)} ", True, (0, 0, 0))
     while show:
         screen.fill('grey')
+        screen.blit(text, (WIDTH // 2 - text.get_width() // 2, 160))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -726,11 +736,12 @@ def settings():
         disables.draw(WIDTH // 2 - 300, HEIGHT // 2, '', 'disabled.png', disabled_volume
                       )
         enabled.draw(WIDTH // 2 - 100, HEIGHT // 2, '', 'enabled.png', enabled_volume
-                      )
+                     )
         pluse.draw(WIDTH // 2 + 100, HEIGHT // 2, '', 'pluse.png', loud_volume
-                      )
+                   )
         minuse.draw(WIDTH // 2 + 300, HEIGHT // 2, '', 'minuse.png', quiet_volume
-                      )
+                    )
+        text = font.render(f"volume:{round(volume, 1)} ", True, (0, 0, 0))
         now_play = FOR_OTHER_SOUND
         pygame.display.update()
 
@@ -740,9 +751,10 @@ def scores():
     pygame.mixer.Sound.stop(now_play)
 
     now_play = FOR_OTHER_SOUND
-    pygame.mixer.Sound.play(now_play)
 
-    menu_background = load_image('for_menu.png')
+    pygame.mixer.Sound.play(now_play, loops=-1)
+
+
     font = pygame.font.Font('../graphics/font/ARCADEPI.TTF', 40)
     base_font = pygame.font.Font(None, 32)
     x_n = 150
@@ -794,7 +806,8 @@ def scores():
 
 
 def help_menu():
-    pygame.mixer.Sound.play(FOR_OTHER_SOUND)
+
+    pygame.mixer.Sound.play(FOR_OTHER_SOUND, loops=-1)
     now_play = FOR_OTHER_SOUND
 
     show = True
@@ -943,8 +956,8 @@ def help_menu():
 def loud_volume():
     global volume
     volume += 0.1
-    if volume == 1.1:
-        volume = 0
+    if volume > 1:
+        volume = 1
 
     MENU_BTN_SOUND.set_volume(volume)
 
@@ -955,13 +968,14 @@ def loud_volume():
     HIT_SOUND.set_volume(volume)
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
+    FINAL_SOUND.set_volume(volume)
 
 
 def quiet_volume():
     global volume
     volume -= 0.1
-    if volume == -0.1:
-        volume = 1
+    if volume < 0:
+        volume = 0
     MENU_BTN_SOUND.set_volume(volume)
 
     POWER_UP_SOUND.set_volume(volume)
@@ -971,6 +985,8 @@ def quiet_volume():
     HIT_SOUND.set_volume(volume)
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
+    FINAL_SOUND.set_volume(volume)
+
 
 def disabled_volume():
     global volume
@@ -984,6 +1000,8 @@ def disabled_volume():
     HIT_SOUND.set_volume(volume)
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
+    FINAL_SOUND.set_volume(volume)
+
 
 def enabled_volume():
     global volume
@@ -997,10 +1015,7 @@ def enabled_volume():
     HIT_SOUND.set_volume(volume)
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
-
-
-
-
+    FINAL_SOUND.set_volume(volume)
 
 
 def game():
@@ -1009,6 +1024,7 @@ def game():
     global count_enemy_kills
     global player_name
     running = True
+
 
     level_map = overworld.return_map()
     player_coordinates = overworld.return_hero_coords()
@@ -1067,9 +1083,19 @@ def game():
                 f"""UPDATE scores set open_levels = {overworld.return_open_levels()} 
                                                 where player_id = (select id from player where name = '{player_name}')""")
 
+            cur.execute(
+                f"""UPDATE scores set enemies = {count_enemy_kills} 
+                                                           where player_id = (select id from player where name = '{player_name}')""")
+
             con.commit()
             if overworld.current_level == 7:
+                global now_play
                 final_form = True
+                pygame.mixer.Sound.stop(now_play)
+
+                now_play = FINAL_SOUND
+                pygame.mixer.Sound.play(now_play, loops=-1)
+
 
                 while final_form:
                     screen.fill('black')
@@ -1128,9 +1154,11 @@ def start_player_input():
     global count_diamond
     global now_play
     global count_enemy_kills
+
     pygame.mixer.Sound.stop(now_play)
     now_play = FOR_OTHER_SOUND
-    pygame.mixer.Sound.play(now_play)
+    pygame.mixer.Sound.play(now_play, loops=-1)
+
 
     continue_btn = Button(350, 100)
     base_font = pygame.font.Font(None, 48)
@@ -1143,6 +1171,7 @@ def start_player_input():
     active = False
     pygame.key.set_repeat(250, 0)
     if __name__ == "__main__":
+
         running = True
         while running:
             for event in pygame.event.get():
@@ -1170,6 +1199,7 @@ def start_player_input():
                             if event.unicode.isalpha() or event.unicode.isdigit() or event.unicode == '_':
                                 name += event.unicode
             screen.blit(load_image('for_menu.png'), (0, 0))
+
             if active:
                 color_rect = color_active
             else:
@@ -1185,6 +1215,7 @@ def start_player_input():
             screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 16))
             screen.blit(text, (input_rect.x, input_rect.y - 46))
             if name:
+
                 if continue_btn.is_clicked(450, 450):
                     player_name = name
                     players_in_bd = [str(i[0]) for i in cur.execute(f"SELECT name from player").fetchall()]
@@ -1196,9 +1227,13 @@ def start_player_input():
                         score = player_information[0][0]
                         count_diamond = player_information[0][1]
                         open_level = player_information[0][2]
+                        overworld.close_all()
+                        print(overworld.levels_open)
                         overworld.update_open_levels(open_level)
                         count_enemy_kills = player_information[0][3]
+
                     else:
+                        overworld.close_all()
                         cur.execute(f"""INSERT INTO player(name) VALUES('{name}')""")
                         cur.execute(f"""INSERT INTO scores(id, player_id) VALUES({length}, {length}) """)
                     con.commit()
@@ -1209,8 +1244,10 @@ def start_player_input():
 
 def start_map_guide():
     global now_play
+
     pygame.mixer.Sound.stop(now_play)
     now_play = FOR_OTHER_SOUND
+    pygame.mixer.Sound.play(now_play, loops=-1)
 
     if overworld.check_open_level(1):
         first_level_image = 'test_btn.png'

@@ -22,6 +22,9 @@ class TravelGuide:
     def update_current_level_pluse(self):
         self.current_level += 1
         self.levels_open[self.current_level] = 'open'
+    def close_all(self):
+        for i in range(1, 6):
+            self.levels_open[i + 1] = 'close'
 
     def update_open_levels(self, count):
         for i in range(count):
@@ -29,7 +32,7 @@ class TravelGuide:
 
     def return_open_levels(self):
         count = 0
-        for i in range(5):
+        for i in range(6):
             if self.levels_open[i + 1] == 'open':
                 count += 1
             else:
