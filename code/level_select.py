@@ -211,17 +211,17 @@ class TravelGuide:
 
     def return_mobs_damage_type_id(self):
         if self.current_level == 1:
-            return 1, 20
+            return 3, 20
         if self.current_level == 2:
-            return 2, 40
+            return 3, 40
         if self.current_level == 3:
             return 1, 60
         if self.current_level == 4:
             return 1, 80
         if self.current_level == 5:
-            return 1, 80
+            return 2, 80
         if self.current_level == 6:
-            return 1, 100
+            return 2, 100
 
     def change_dict(self, id):
         self.levels_open[id] = 'Open'

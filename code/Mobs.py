@@ -30,11 +30,17 @@ class Mob(AnimatedTile):
                                load_image('../graphics/enemies/Walk/Walk_2.png'),
                                load_image('../graphics/enemies/Walk/Walk_3.png'),
                                load_image('../graphics/enemies/Walk/Walk_4.png')]
+
         if type_id == 2:
-            self.animations = [load_image('../graphics/enemies/Walk_2/Walk_1.png'),
-                               load_image('../graphics/enemies/Walk_2/Walk_2.png'),
-                               load_image('../graphics/enemies/Walk_2/Walk_3.png'),
-                               load_image('../graphics/enemies/Walk_2/Walk_4.png')]
+            self.animations = [load_image('../graphics/enemies/Walk_3/Walk_1.png'),
+                               load_image('../graphics/enemies/Walk_3/Walk_2.png'),
+                               load_image('../graphics/enemies/Walk_3/Walk_3.png'),
+                               load_image('../graphics/enemies/Walk_3/Walk_4.png')]
+        if type_id == 3:
+            self.animations = [load_image('../graphics/enemies/Walk_4/Walk_1.png'),
+                               load_image('../graphics/enemies/Walk_4/Walk_2.png'),
+                               load_image('../graphics/enemies/Walk_4/Walk_3.png'),
+                               load_image('../graphics/enemies/Walk_4/Walk_4.png')]
         self.loading_hero_sprites()
         super().__init__(pos, size, self.animations)
         self.rect.y += size - self.image.get_size()[1]
