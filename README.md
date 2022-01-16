@@ -8,6 +8,7 @@ Traveller: In Search of Treasures
 1. [Управление](#Управление)
 2. [Особенности проекта и геймплея](#Особенности-проекта-и-геймплея)
 3. [Внешний вид](#Внешний-вид)
+4. [Видео](#Видео)
 
 ## Запуск:
 
@@ -50,4 +51,10 @@ Traveller: In Search of Treasures
 ![Alt-текст](resources/menu_screen.png "Внешний вид меню") ![Alt-текст](resources/help_screen.png "Внешний вид Помощи по игре")
 ![Alt-текст](resources/play_screen.png "Внешний вид игрового процесса") ![Alt-текст](resources/endgame_screen.png "Внешний вид окончания игры")
 
+[:arrow_up:Оглавление](#Оглавление)
+
+## Видео
+[![Watch the video]](https://www.youtube.com/watch?v=03uak1895JU)
+
 https://www.canva.com/design/DAE1c4aoVnE/83BJIf7NyF0OACJyaXNycA/view?utm_content=DAE1c4aoVnE&utm_campaign=designshare&utm_medium=link&utm_source=sharebutton
+[:arrow_up:Оглавление](#Оглавление)
