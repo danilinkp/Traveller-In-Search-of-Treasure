@@ -4,7 +4,7 @@ import pygame
 class Tile(pygame.sprite.Sprite):
     """Класс, который отвечает за прорисовку карты"""
 
-    def __init__(self, pos, size, image):
+    def __init__(self, pos, image):
         super().__init__()
         self.image = image
         self.mask = pygame.mask.from_surface(self.image)

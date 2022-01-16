@@ -86,7 +86,7 @@ class ParticleEffect(pygame.sprite.Sprite):
 class HitEffect(ParticleEffect):
     """Класс, который отрисовывает эффект получения урона"""
 
-    def __init__(self, pos, type_of_movement):
+    def __init__(self, pos):
         super().__init__(pos, 'hit')
 
     def animate(self):
