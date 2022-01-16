@@ -54,7 +54,5 @@ Traveller: In Search of Treasures
 [:arrow_up:Оглавление](#Оглавление)
 
 ## Видео
-[![Watch the video]](https://www.youtube.com/watch?v=03uak1895JU)
-
-https://www.canva.com/design/DAE1c4aoVnE/83BJIf7NyF0OACJyaXNycA/view?utm_content=DAE1c4aoVnE&utm_campaign=designshare&utm_medium=link&utm_source=sharebutton
+[![Watch the video](resources/menu_screen.png)](https://www.youtube.com/watch?v=03uak1895JU)
 [:arrow_up:Оглавление](#Оглавление)
