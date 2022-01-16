@@ -1208,7 +1208,7 @@ def start_player_input():
                     length = len(players_in_bd) + 1
                     if str(name) in players_in_bd:
                         player_information = cur.execute(
-                            f"""SELECT score, diamonds, open_levels from scores 
+                            f"""SELECT score, diamonds, open_levels, enemies from scores 
                             WHERE player_id = (SELECT id FROM player WHERE name = '{name}')""").fetchall()
                         score = player_information[0][0]
                         print(score)
