@@ -67,6 +67,7 @@ GAME_OVER_SOUND = pygame.mixer.Sound('sounds/g_over.wav')
 KILL_SOUND = pygame.mixer.Sound('sounds/stomp.wav')
 FINAL_SOUND = pygame.mixer.Sound('sounds/final_sound.wav')
 
+GAME_SOUND = pygame.mixer.Sound('sounds/for_game2.wav')
 now_play = FOR_OTHER_SOUND
 MENU_BTN_SOUND.set_volume(volume)
 
@@ -78,6 +79,7 @@ HIT_SOUND.set_volume(volume)
 GAME_OVER_SOUND.set_volume(volume)
 KILL_SOUND.set_volume(volume)
 FINAL_SOUND.set_volume(volume)
+GAME_SOUND.set_volume(volume)
 
 
 class Button:
@@ -1024,7 +1026,11 @@ def game():
     global count_diamond
     global count_enemy_kills
     global player_name
+    global now_play
     running = True
+    pygame.mixer.Sound.stop(now_play)
+    now_play = GAME_SOUND
+    pygame.mixer.Sound.play(now_play, loops=-1)
 
     level_map = overworld.return_map()
     player_coordinates = overworld.return_hero_coords()
@@ -1088,7 +1094,7 @@ def game():
 
             con.commit()
             if overworld.current_level == 7:
-                global now_play
+
                 final_form = True
                 pygame.mixer.Sound.stop(now_play)
 
