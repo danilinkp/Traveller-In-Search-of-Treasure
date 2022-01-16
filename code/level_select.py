@@ -8,7 +8,7 @@ class TravelGuide:
                             3: 'close',
                             4: 'close',
                             5: 'close',
-                            6: 'open'
+                            6: 'close'
                             }
 
     def update_current_level(self, level_id):
@@ -22,6 +22,24 @@ class TravelGuide:
     def update_current_level_pluse(self):
         self.current_level += 1
         self.levels_open[self.current_level] = 'open'
+    def close_all(self):
+        for i in range(1, 6):
+            self.levels_open[i + 1] = 'close'
+
+    def update_open_levels(self, count):
+        for i in range(count):
+            self.levels_open[i + 1] = 'open'
+
+    def return_open_levels(self):
+        count = 0
+        for i in range(6):
+            if self.levels_open[i + 1] == 'open':
+                count += 1
+            else:
+                break
+        return count
+
+
 
     def return_map(self):
         if self.current_level == 1:
@@ -193,17 +211,17 @@ class TravelGuide:
 
     def return_mobs_damage_type_id(self):
         if self.current_level == 1:
-            return 1, 20
+            return 3, 20
         if self.current_level == 2:
-            return 2, 40
+            return 3, 40
         if self.current_level == 3:
             return 1, 60
         if self.current_level == 4:
             return 1, 80
         if self.current_level == 5:
-            return 1, 80
+            return 2, 80
         if self.current_level == 6:
-            return 1, 100
+            return 2, 100
 
     def change_dict(self, id):
         self.levels_open[id] = 'Open'
