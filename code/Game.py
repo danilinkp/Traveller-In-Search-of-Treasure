@@ -14,7 +14,7 @@ from particles import ParticleEffect, HitEffect
 from level_select import TravelGuide
 
 pygame.init()
-pygame.display.set_caption('pygame-project')
+pygame.display.set_caption('Traveller:In Search of Treasure')
 
 SIZE = WIDTH, HEIGHT = 1280, 764
 screen = pygame.display.set_mode((1280, 764), pygame.FULLSCREEN)
@@ -854,6 +854,7 @@ def loud_volume():
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
     FINAL_SOUND.set_volume(volume)
+    GAME_SOUND.set_volume(volume)
 
 
 def quiet_volume():
@@ -871,6 +872,7 @@ def quiet_volume():
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
     FINAL_SOUND.set_volume(volume)
+    GAME_SOUND.set_volume(volume)
 
 
 def disabled_volume():
@@ -886,6 +888,7 @@ def disabled_volume():
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
     FINAL_SOUND.set_volume(volume)
+    GAME_SOUND.set_volume(volume)
 
 
 def enabled_volume():
@@ -901,6 +904,7 @@ def enabled_volume():
     GAME_OVER_SOUND.set_volume(volume)
     KILL_SOUND.set_volume(volume)
     FINAL_SOUND.set_volume(volume)
+    GAME_SOUND.set_volume(volume)
 
 
 def game():

@@ -86,14 +86,14 @@ class ParticleEffect(pygame.sprite.Sprite):
 class HitEffect(ParticleEffect):
     """Класс, который отрисовывает эффект получения урона"""
 
-    def __init__(self, pos):
+    def __init__(self, pos, type_of_movement):
         super().__init__(pos, 'hit')
 
     def animate(self):
         # Счетчик
         self.frame_index += 1
         if self.frame_index >= len(self.frames):
-            self.kill()  # удаляет спрайт из всех групп
+            self.kill()
         else:
             self.image = self.frames[int(self.frame_index)]
 
