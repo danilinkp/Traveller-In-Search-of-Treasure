@@ -20,7 +20,7 @@ def load_image(name, dictor='', colorkey=None):
     else:
         image = image.convert_alpha()
     return image
-
+#
 
 class Mob(AnimatedTile):
     def __init__(self, pos, size, hit_count, id):
